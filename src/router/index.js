@@ -4,6 +4,7 @@ import About from '../views/About.vue'
 import Auth from '../views/Auth.vue'
 import History from '../views/History.vue'
 import Registration from '../views/Registration.vue'
+import AuthTest from '../views/AuthTest.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,11 @@ const router = createRouter({
       path: '/auth',
       name: 'auth',
       component: Auth
+    },
+    {
+      path: '/authTest',
+      name: 'authTest',
+      component: AuthTest
     },
     {
       path: '/registration',
