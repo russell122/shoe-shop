@@ -5,6 +5,7 @@ import Auth from '../views/Auth.vue'
 import History from '../views/History.vue'
 import Registration from '../views/Registration.vue'
 import AuthTest from '../views/AuthTest.vue'
+import NotFound from '../views/NotFound.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,11 @@ const router = createRouter({
       name: 'registration',
       component: Registration
     },
+    {
+      path: '/:pathMatch(.*)*', // Это обрабатывает все неизвестные пути
+      name: 'NotFound',
+      component: NotFound
+    }
   ]
 })
 
