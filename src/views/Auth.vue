@@ -1,193 +1,177 @@
 <script setup>
-	import { ref } from "vue";
-	import axios from "axios";
-	import { useForm } from 'vee-validate';
-	import * as yup from 'yup';
+import { ref } from 'vue';
+import axios from "axios";
+import { useForm } from 'vee-validate';
+import * as yup from 'yup';
 
-	import { storeToRefs } from 'pinia'
+import Loader from '@/components/Loader.vue';
 
-	import { useRouter } from "vue-router";
+import { storeToRefs } from 'pinia'
 
-	import InputText from 'primevue/inputtext';
-	import Password from 'primevue/password';
-	import FloatLabel from 'primevue/floatLabel';
-	import Button from 'primevue/button';
-	import InlineMessage from 'primevue/inlinemessage';
-	import Message from 'primevue/message';
+import { useRouter } from "vue-router";
 
-	const router = useRouter();
+const router = useRouter();
 
-	import { useOtherStore } from '@/stores/other.js'
+import { useOtherStore } from '@/stores/other.js'
 
-	const otherStore = useOtherStore();
+const otherStore = useOtherStore();
 
-	const { authorised, globalLogin } = storeToRefs(otherStore)
+const { authorised, globalLogin, overlay } = storeToRefs(otherStore)
 
-	// const login = ref()
-	// const password = ref()
-	// const isValidAuth = ref({
-	// 	login: null,
-	// 	password: null,
-	// 	passwordLength: null
-	// })
-	const authorisedError = ref(false)
+const show1 = ref(false);
+const loading = ref(false);
+const authorisedError = ref(false)
 
-	const {values, errors, defineField, validate } = useForm({
-		validationSchema: yup.object({
-			login: yup.string().min(3, 'Логин должен минимум 3 символа').max(20, 'Слишком длинный логин').required('Введите логин'),
-			password: yup.string().min(6, 'Пароль должен быть минимум 6 символов').max(20, 'Слишком длинный пароль').required('Введите Пароль'),
-		})
-	});
+const {values, errors, defineField, validate, handleSubmit, handleReset } = useForm({
+	validationSchema: yup.object({
+		login: yup.string().min(3, 'Логин должен минимум 3 символа').max(20, 'Слишком длинный логин').required('Введите логин'),
+		password: yup.string().min(6, 'Пароль должен быть минимум 6 символов').max(20, 'Слишком длинный пароль').required('Введите пароль'),
+	})
+});
 
-	const [login, loginAttrs] = defineField('login', state => {
-		console.log('он')
-		console.log(state)
-		return {
-			validateOnModelUpdate: false,
-		}
-	});
+const [login, loginAttrs] = defineField('login', {
+	validateOnModelUpdate: false,
+});
 
-	const [password, passwordAttrs] = defineField('password', state => {
-		console.log('он')
-		console.log(state)
-		return {
-			validateOnModelUpdate: false,
-		}
-	});
-
-	// Метод для проверки формы
-	const validateForm = async () => {
-		const result = await validate();
-		if (result.valid) {
-			console.log('Форма валидна');
-			try {
-					const { data } = await axios.post('https://7402571ecc17c5c9.mokky.dev/auth', {
-						login: login.value,
-						password: password.value
-					})
-
-					console.log('Мы в трай')
-					console.log(data)
+const [password, passwordAttrs] = defineField('password', {
+	validateOnModelUpdate: false,
+});
 
 
+/**
+ * Авторизация пользователя, запись в localStorage, запуск логики authorised
+ */
+const autorization = handleSubmit(async values => {
 
-			} catch (error) {
-				console.log('УПАЛ В КЕТЧ при входе')
-				console.log(error)
+	authorised.value = null
+	authorisedError.value = false
+	overlay.value = true
+
+	setTimeout(async () => {
+		try {
+			const { data } = await axios.post('https://7402571ecc17c5c9.mokky.dev/auth', {
+				login: values.login,
+				password: values.password
+			})
+
+			if(data.token){
+				globalLogin.value = login.value;
+				authorised.value = true;
+
+				localStorage.setItem('tokenShoe', data.token)
+				localStorage.setItem('login', login.value)
+				// localStorage.setItem('password', password.value)
+
+				setTimeout(() => {
+					const command = () => {
+						router.push('/')
+					}
+
+					command()
+				}, 2000)
+
+				console.log("Успешный вход")
+				console.log(data)
+			} else {
+				console.log('Шляяяяяяпа')
 				authorisedError.value = true
 			}
-		} else {
-			console.log('Форма содержит ошибки');
-			console.log(result)
-		}
-	};
-
-	/**
-	 * Авторизация пользователя, запись в localStorage, запуск логики authorised
-	 */
-
-	const autorization = async () => {
-			// if (!login.value) {
-			// 	isValidAuth.value.login = false
-			// } else {
-			// 	isValidAuth.value.login = true
-			// }
-			// if(!password.value) {
-			// 	isValidAuth.value.password = false
-			// } else {
-			// 	isValidAuth.value.password = true
-			// }
-			// if(password.value && password.value.length < 6) {
-			// 	isValidAuth.value.passwordLength = false
-			// } else {
-			// 	isValidAuth.value.passwordLength = true
-			// }
-
-		try {
-				if(isValidAuth.value.login && isValidAuth.value.password && isValidAuth.value.passwordLength) {
-					const { data } = await axios.post('https://7402571ecc17c5c9.mokky.dev/auth', {
-						login: login.value,
-						password: password.value
-					})
-
-					globalLogin.value = login.value;
-					authorised.value = true;
-					authorisedError.value = false;
-					localStorage.setItem('tokenShoe', data.token)
-					localStorage.setItem('login', login.value)
-					localStorage.setItem('password', password.value)
-
-					setTimeout(() => {
-						const command = () => {
-							router.push('/')
-						}
-
-						command()
-					}, 1000)
-
-				}  else {
-					return false
-				}
-
 		} catch (error) {
-			console.log('УПАЛ В КЕТЧ при входе')
+			console.log('Упали в кетч')
 			console.log(error)
 			authorisedError.value = true
+		} finally {
+			overlay.value = false
 		}
-		finally {
+	}, 2000)
 
-		}
-	}
 
+});
+
+const clearAuth = () => {
+	authorisedError.value = false
+	handleReset();
+}
 </script>
 
 <template>
-	<div class="container">
+	<v-sheet class="mx-auto custom-form" width="400">
+		<form @submit.prevent="autorization">
+			<v-text-field
+					label="Логин"
+					type="text"
+					hint="Введите ваш логин"
+					persist-placeholder
+					clearable
+					v-model="login"
+					v-bind="loginAttrs"
+					:counter="20"
+					:error-messages="errors.login"
+			></v-text-field>
 
-		<form class="login">
+			<v-text-field
+					label="Пароль"
+					:type="show1 ? 'text' : 'password'"
+					hint="Введите ваш пароль"
+					persist-placeholder
+					clearable
+					v-model="password"
+					v-bind="passwordAttrs"
+					:error-messages="errors.password"
+					:append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+					name="input-10-1"
+					counter
+					@click:append="show1 = !show1"
+			></v-text-field>
 
-			<FloatLabel>
-				<InputText id="username" type="text" v-model="login" v-bind="loginAttrs" required :invalid="!!errors.login"/>
-				<label for="username">Логин</label>
-			</FloatLabel>
-			<InlineMessage v-if="errors.login" class="message message-login">{{ errors.login }}</InlineMessage>
+			<v-btn
+					class="me-4"
+					type="submit"
+					size="large"
+					elevation="4"
+					color="#334155"
+					:loading="loading"
+			>
+				Войти
+			</v-btn>
 
-			<p>{{login}}</p>
-			<p>{{loginAttrs}}</p>
+			<v-btn
+					size="large"
+					elevation="4"
+					color="#334155"
+					@click="clearAuth"
+			>
+				Очистить
+			</v-btn>
 
-<!--			<FloatLabel>-->
-<!--				<InputText id="passwordname" type="text" v-model="password" v-bind="passwordAttrs" required :invalid="!!errors.password"/>-->
-<!--				<label for="username">Парольььь</label>-->
-<!--			</FloatLabel>-->
-<!--			<InlineMessage v-if="errors.password" class="message message-login">{{ errors.password }}</InlineMessage>-->
+			<div v-auto-animate>
+				<v-alert
+						v-if="authorised"
+						text="Успешный вход"
+						title=""
+						type="success"
+						icon="mdi-balloon"
+				></v-alert>
+			</div>
+			<div v-auto-animate>
+				<v-alert
+						v-if="authorisedError"
+						text="Не верный логин или пароль"
+						title="Ошибка!"
+						type="error"
+				></v-alert>
+			</div>
 
-			<FloatLabel>
-				<Password id="passwordname" v-model="password" v-bind="passwordAttrs" required :feedback="false" :invalid="!!errors.password" />
-				<label for="passwordname">Пароль</label>
-			</FloatLabel>
-			<InlineMessage v-if="errors.password" class="message message-password">{{ errors.password }}</InlineMessage>
-
-			<Button label="Войти" @click="validateForm" />
-
-			<Message severity="success" v-if="authorised" :closable="false">Успешный вход</Message>
-			<Message severity="error" v-if="authorisedError" :closable="false">Неверный логин или пароль</Message>
 
 		</form>
+	</v-sheet>
 
-	</div>
+
+	<Loader/>
 </template>
 
 <style lang="scss">
-	.message  {
-		width: 50%;
-		display: flex;
-		justify-content: flex-start;
-		padding: 10px;
-	}
-	.login{
-		.p-message{
-			width: 50%;
-			padding: 10px;
-		}
-	}
+.custom-form{
+	padding: 50px 0;
+}
 </style>

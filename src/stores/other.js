@@ -7,6 +7,7 @@ export const useOtherStore = defineStore('other', () => {
   const sliderData = ref([])
   const authorised = ref(null)
   const globalLogin = ref()
+  const overlay = ref(false)
 
   onMounted(async () => {
     await getSliderData();
@@ -21,5 +22,5 @@ export const useOtherStore = defineStore('other', () => {
     }
   }
 
-  return { sliderData, authorised, globalLogin }
+  return { sliderData, authorised, globalLogin, overlay }
 })
