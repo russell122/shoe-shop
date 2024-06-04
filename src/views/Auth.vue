@@ -18,7 +18,7 @@ const otherStore = useOtherStore();
 
 const { authorised, globalLogin, overlay } = storeToRefs(otherStore)
 
-const show1 = ref(false);
+const showPassword = ref(false);
 const loading = ref(false);
 const authorisedError = ref(false)
 
@@ -111,17 +111,17 @@ const clearAuth = () => {
 
 			<v-text-field
 					label="Пароль"
-					:type="show1 ? 'text' : 'password'"
+					:type="showPassword ? 'text' : 'password'"
 					hint="Введите ваш пароль"
 					persist-placeholder
 					clearable
 					v-model="password"
 					v-bind="passwordAttrs"
 					:error-messages="errors.password"
-					:append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+					:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
 					name="input-10-1"
 					counter
-					@click:append="show1 = !show1"
+					@click:append="showPassword = !showPassword"
 			></v-text-field>
 
 			<v-btn
