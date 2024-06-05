@@ -110,7 +110,7 @@ watch(
 			globalLogin.value = '';
 			localStorage.removeItem('tokenShoe')
 			localStorage.removeItem('login')
-			localStorage.removeItem('password')
+			// localStorage.removeItem('password')
 		}
 	}
 
