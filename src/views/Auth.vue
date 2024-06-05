@@ -21,6 +21,7 @@ const { authorised, globalLogin, overlay } = storeToRefs(otherStore)
 const showPassword = ref(false);
 const loading = ref(false);
 const authorisedError = ref(false)
+const noSuchUser = ref(false)
 
 const {values, errors, defineField, validate, handleSubmit, handleReset } = useForm({
 	validationSchema: yup.object({
@@ -79,7 +80,12 @@ const autorization = handleSubmit(async values => {
 		} catch (error) {
 			console.log('Упали в кетч')
 			console.log(error)
-			authorisedError.value = true
+			if(error.response.status === 401) {
+				noSuchUser.value = true
+			} else {
+				authorisedError.value = true
+			}
+
 		} finally {
 			overlay.value = false
 		}
@@ -155,8 +161,16 @@ const clearAuth = () => {
 			</div>
 			<div v-auto-animate>
 				<v-alert
-						v-if="authorisedError"
+						v-if="noSuchUser"
 						text="Не верный логин или пароль"
+						title="Ошибка!"
+						type="error"
+				></v-alert>
+			</div>
+			<div v-auto-animate>
+				<v-alert
+						v-if="authorisedError"
+						text="Попробуйте ещё раз немного позже"
 						title="Ошибка!"
 						type="error"
 				></v-alert>

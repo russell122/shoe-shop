@@ -1,79 +1,73 @@
 <script setup>
-	import { ref } from 'vue'
-	import axios from "axios";
+import { ref } from 'vue';
+import axios from "axios";
+import { useForm } from 'vee-validate';
+import * as yup from 'yup';
 
-	import { storeToRefs } from "pinia";
+import Loader from '@/components/Loader.vue';
 
-	import { useRouter } from "vue-router";
+import { storeToRefs } from 'pinia'
 
-	import InputText from 'primevue/inputtext';
-	import Password from 'primevue/password';
-	import FloatLabel from 'primevue/floatLabel';
-	import Button from 'primevue/button';
+import { useRouter } from "vue-router";
 
-	const router = useRouter()
+const router = useRouter();
 
-	import { useOtherStore } from '@/stores/other.js'
-	import InlineMessage from "primevue/inlinemessage";
-	import Message from "primevue/message";
+import { useOtherStore } from '@/stores/other.js'
 
-	const otherStore = useOtherStore();
+const otherStore = useOtherStore();
 
-	const { authorised, globalLogin } = storeToRefs(otherStore)
+const { authorised, globalLogin, overlay } = storeToRefs(otherStore)
 
-	const loginReg = ref()
-	const emailReg = ref()
-	const passwordReg = ref()
-	const isValidRegistration = ref({
-		login: null,
-		email: null,
-		password: null,
-		passwordLength: null
+const show1 = ref(false);
+const loading = ref(false);
+const registrationError = ref(false)
+const userAlreadyExists = ref(false)
+
+const {values, errors, defineField, validate, handleSubmit, handleReset } = useForm({
+	validationSchema: yup.object({
+		login: yup.string().min(3, 'Логин должен минимум 3 символа').max(20, 'Слишком длинный логин').required('Введите логин'),
+		password: yup.string().min(6, 'Пароль должен быть минимум 6 символов').max(20, 'Слишком длинный пароль').required('Введите пароль'),
+		email: yup.string().email('Некорректная почта').required('Введите почту'),
 	})
+});
 
-	const registrationError = ref(false)
-	const userAlreadyExists = ref(false)
+const [login, loginAttrs] = defineField('login', {
+	validateOnModelUpdate: false,
+});
+
+const [email, emailAttrs] = defineField('email', {
+	validateOnModelUpdate: false,
+});
+
+const [password, passwordAttrs] = defineField('password', {
+	validateOnModelUpdate: false,
+});
 
 
-	/**
-	 * Регистрация нового пользователя
-	 */
-	const registration = async () => {
-		if (!loginReg.value) {
-			isValidRegistration.value.login = false
-		} else {
-			isValidRegistration.value.login = true
-		}
-		if (!emailReg.value) {
-			isValidRegistration.value.email = false
-		} else {
-			isValidRegistration.value.email = true
-		}
-		if (!passwordReg.value) {
-			isValidRegistration.value.password = false
-		} else {
-			isValidRegistration.value.password = true
-		}
-		if(passwordReg.value && passwordReg.value.length < 6) {
-			isValidRegistration.value.passwordLength = false
-		} else {
-			isValidRegistration.value.passwordLength = true
-		}
+/**
+ * Регистрация пользователя, запись в localStorage, запуск логики authorised
+ */
+const registration = handleSubmit(async values => {
 
+	authorised.value = null
+	registrationError.value = false
+	overlay.value = true
+
+	setTimeout(async () => {
 		try {
-			if(isValidRegistration.value.login && isValidRegistration.value.email && isValidRegistration.value.password && isValidRegistration.value.passwordLength) {
-				const { data } = await axios.post('https://7402571ecc17c5c9.mokky.dev/register', {
-					login : loginReg.value,
-					email: emailReg.value,
-					password: passwordReg.value
-				})
+			const { data } = await axios.post('https://7402571ecc17c5c9.mokky.dev/register', {
+				login: values.login,
+				email: values.email,
+				password: values.password
+			})
 
-				globalLogin.value = loginReg.value;
+			if(data.token){
+				globalLogin.value = login.value;
 				authorised.value = true;
-				registrationError.value = false;
-				localStorage.setItem('tokenShoe', data.token);
-				localStorage.setItem('login', loginReg.value);
-				localStorage.setItem('password', passwordReg.value);
+
+				localStorage.setItem('tokenShoe', data.token)
+				localStorage.setItem('login', login.value)
+				// localStorage.setItem('password', password.value)
 
 				setTimeout(() => {
 					const command = () => {
@@ -81,61 +75,134 @@
 					}
 
 					command()
-				}, 1000)
+				}, 2000)
 
+				console.log("Успешный вход")
 				console.log(data)
 			} else {
-				return false
+				console.log('Шляяяяяяпа')
+				registrationError.value = true
 			}
-
 		} catch (error) {
-			console.log('УПАЛ В КЕТЧ при регистрации')
-			console.log(error.response)
+			console.log('Упали в кетч')
+			console.log(error)
 			if(error.response.status === 401) {
 				userAlreadyExists.value = true;
+			} else {
+				registrationError.value = true
 			}
-			registrationError.value = true;
+		} finally {
+			overlay.value = false
 		}
-	}
+	}, 2000)
+
+
+});
+
+const clearAuth = () => {
+	registrationError.value = false
+	handleReset();
+}
 </script>
 
 <template>
-	<div class="container">
-		<form class="login">
-			<FloatLabel>
-				<InputText id="username2" type="text" v-model="loginReg" required :invalid="isValidRegistration.login === false || registrationError"/>
-				<label for="username2">Логин</label>
-			</FloatLabel>
-			<InlineMessage v-if="isValidRegistration.login === false" class="message message-login">Введите имя</InlineMessage>
-			<FloatLabel>
-				<InputText id="email2" type="email" v-model="emailReg" required :invalid="isValidRegistration.email === false || registrationError"/>
-				<label for="email2">Почта</label>
-			</FloatLabel>
-			<InlineMessage v-if="isValidRegistration.email === false" class="message message-login">Введите почту</InlineMessage>
-			<FloatLabel>
-				<Password v-model="passwordReg" inputId="password2" :feedback="false" required toggleMask :invalid="isValidRegistration.password === false || isValidRegistration.passwordLength === false || registrationError"/>
-				<label for="password2"  :style="{ color: isValidRegistration.password === false || isValidRegistration.passwordLength === false || registrationError ? '#f87171' : '' }">Пароль</label>
-			</FloatLabel>
-			<InlineMessage v-if="isValidRegistration.password === false" class="message message-password">Введите пароль</InlineMessage>
-			<InlineMessage v-if="isValidRegistration.passwordLength === false" class="message message-password">Минимальная длина пароля 6 символов</InlineMessage>
-			<Button label="Войти" @click="registration" />
-			<Message severity="success" v-if="authorised" :closable="false">Успешная регистрация</Message>
-			<Message severity="error" v-if="userAlreadyExists" :closable="false">Такой пользователь уже существует</Message>
+	<v-sheet class="mx-auto custom-form" width="600">
+		<form @submit.prevent="registration">
+			<v-text-field
+					label="Логин"
+					type="text"
+					hint="Введите логин"
+					persist-placeholder
+					clearable
+					v-model="login"
+					v-bind="loginAttrs"
+					:counter="20"
+					:error-messages="errors.login"
+			></v-text-field>
+
+			<v-text-field
+					label="Адресс электронной почты"
+					placeholder="aboba@gmail.com"
+					type="email"
+					hint="Введите почту"
+					persist-placeholder
+					clearable
+					v-model="email"
+					v-bind="emailAttrs"
+					:error-messages="errors.email"
+			></v-text-field>
+
+			<v-text-field
+					label="Пароль"
+					:type="show1 ? 'text' : 'password'"
+					hint="Введите пароль"
+					persist-placeholder
+					clearable
+					v-model="password"
+					v-bind="passwordAttrs"
+					:error-messages="errors.password"
+					:append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+					name="input-10-1"
+					counter
+					@click:append="show1 = !show1"
+			></v-text-field>
+
+			<v-btn
+					class="me-4"
+					type="submit"
+					size="large"
+					elevation="4"
+					color="#334155"
+					:loading="loading"
+			>
+				Зарегистрироваться
+			</v-btn>
+
+			<v-btn
+					size="large"
+					elevation="4"
+					color="#334155"
+					@click="clearAuth"
+			>
+				Очистить
+			</v-btn>
+
+			<div v-auto-animate>
+				<v-alert
+						v-if="authorised"
+						text="Успешная регистрация"
+						title=""
+						type="success"
+						icon="mdi-balloon"
+				></v-alert>
+			</div>
+			<div v-auto-animate>
+				<v-alert
+						v-if="userAlreadyExists"
+						text="Такой пользователь уже существует"
+						title="Ошибка!"
+						type="error"
+				></v-alert>
+			</div>
+			<div v-auto-animate>
+				<v-alert
+						v-if="registrationError"
+						text="Попробуйте ещё раз немного позже"
+						title="Ошибка!"
+						type="error"
+				></v-alert>
+			</div>
+
+
 		</form>
-	</div>
+	</v-sheet>
+
+
+	<Loader/>
 </template>
 
 <style lang="scss">
-.message  {
-	width: 50%;
-	display: flex;
-	justify-content: flex-start;
-	padding: 10px;
-}
-.login{
-	.p-message{
-		width: 50%;
-		padding: 10px;
-	}
+.custom-form{
+	padding: 50px 0;
 }
 </style>
