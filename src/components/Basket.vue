@@ -14,7 +14,7 @@
 		position: fixed;
 		top: 0;
 		right: 0;
-		z-index: 1001;
+		z-index: 100001;
 		background-color: white;
 		width: 500px;
 		height: 100%;

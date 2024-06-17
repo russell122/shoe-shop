@@ -1,18 +1,38 @@
 <script setup>
 	import { RouterView } from 'vue-router'
 
+	import { useOtherStore } from '@/stores/other.js'
+
 	import Header from '@/components/Header.vue'
+	import HeaderTest from '@/components/HeaderTest.vue'
 	import Footer from "@/components/Footer.vue";
 	import Test2GIS from "@/components/Test2GIS.vue";
+	import {onMounted} from "vue";
+	import {storeToRefs} from "pinia";
+
+	const otherStore = useOtherStore();
+
+	const { globalLogin, authorised } = storeToRefs(otherStore)
+
+	/**
+	 * Проверяем при заходе на сайт авторизован ли уже пользователь, если да то запускается логика authorised
+	 */
+	onMounted(() => {
+		globalLogin.value = localStorage.getItem('login');
+		if(globalLogin.value){
+			authorised.value = true;
+		}
+	})
 
 </script>
 
 <template>
 	<div class="content">
-		<Header/>
-<!--		<Test2GIS/>-->
+			<Header/>
+			<HeaderTest/>
+			<!--		<Test2GIS/>-->
 
-		<RouterView />
+			<RouterView />
 
 		<Footer/>
 	</div>
