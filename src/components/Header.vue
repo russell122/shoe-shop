@@ -183,7 +183,7 @@ watch(
 <style lang="scss">
 	.header{
 		padding: 43px 0;
-		border-bottom: 1px solid #EAEAEA;
+		//border-bottom: 1px solid #EAEAEA;
 		@media screen and (max-width: 1199px) {
 			padding: 30px 0;
 		}

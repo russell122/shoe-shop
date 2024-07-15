@@ -28,7 +28,7 @@
 
 <template>
 	<div class="content">
-			<Header/>
+<!--			<Header/>-->
 			<HeaderTest/>
 			<!--		<Test2GIS/>-->
 
