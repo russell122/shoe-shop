@@ -73,5 +73,8 @@
 	.menu__list-icon i.active{
 		transform: rotate(90deg);
 	}
+	.submenu{
+		padding-left: 20px;
+	}
 
 </style>
