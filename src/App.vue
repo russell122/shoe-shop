@@ -3,10 +3,6 @@
 
 	import { useOtherStore } from '@/stores/other.js'
 
-	import Header from '@/components/Header.vue'
-	import HeaderTest from '@/components/HeaderTest.vue'
-	import Footer from "@/components/Footer.vue";
-	import Test2GIS from "@/components/Test2GIS.vue";
 	import {onMounted} from "vue";
 	import {storeToRefs} from "pinia";
 
@@ -28,13 +24,9 @@
 
 <template>
 	<div class="content">
-<!--			<Header/>-->
-			<HeaderTest/>
-			<!--		<Test2GIS/>-->
 
 			<RouterView />
 
-		<Footer/>
 	</div>
 
 </template>
@@ -65,6 +57,11 @@
 		@media screen and (max-width: 768px) {
 			max-width: none;
 		}
+	}
+	.img{
+		display: block;
+		max-width: 100%;
+		height: auto;
 	}
 	.login{
 		display: flex;
