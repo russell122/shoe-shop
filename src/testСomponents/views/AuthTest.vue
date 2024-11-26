@@ -19,6 +19,7 @@ const test = () => {
 </script>
 
 <template>
+	<p>123</p>
 	<input v-model="email" v-bind="emailAttrs" @input="test"/>
 
 	<pre>values: {{ values }}</pre>
