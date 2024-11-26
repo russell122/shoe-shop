@@ -1,12 +1,9 @@
 <script setup>
-	import { ref, watch } from 'vue'
+	import { ref, watch, computed } from 'vue'
 
 	import { RouterLink, useRouter } from 'vue-router'
 
 	import Basket from '@/components/Basket.vue'
-
-	import Menubar from 'primevue/menubar';
-	import Sidebar from 'primevue/sidebar';
 
 	import { storeToRefs } from 'pinia'
 
@@ -18,100 +15,56 @@
 
 	const price = ref(1205)
 	const visibleRight = ref(false)
+	const drawer = ref(null)
+	const overlay = ref(false)
+	const items = ref([
+		{
+			title: 'Вход',
+			value: 'Вход',
+			type: 'inlet',
+			isDisplayedOnAuth: false,
+			route: '/auth',
+		},
+		{
+			title: 'Регистрация',
+			value: 'Регистрация',
+			type: 'registration',
+			isDisplayedOnAuth: false,
+			route: '/registration',
+		},
+		{
+			title: 'Выход',
+			value: 'Выход',
+			isDisplayedOnAuth: true,
+			type: 'exit',
+			route: '/',
+		},
+	])
 
 	const router = useRouter();
-
-	const itemsMenubar = ref([
-		{
-			label: price.value + ' руб.',
-			icon: '/cart.svg',
-			alt: 'logo',
-			priceClass: true,
-		},
-		{
-			label: 'Закладки',
-			icon: '/heart.svg',
-			alt: 'heart',
-			route: '/about',
-		},
-		{
-			label: 'Профиль',
-			icon: '/profile.svg',
-			alt: 'profile',
-			profile: true,
-			items: [
-				{
-					label: 'Вход',
-					icon: '/profile.svg',
-					alt: 'auth',
-					route: '/auth',
-					authAction: true,
-					statusLogin: true,
-					command: () => {
-						router.push('/auth');
-					}
-				},
-				{
-					label: 'Регистрация',
-					icon: '/profile.svg',
-					alt: 'registration',
-					route: '/registration',
-					authAction: true,
-					statusLogin: true,
-					command: () => {
-						router.push('/registration');
-					}
-				},
-				{
-					label: 'История покупок',
-					icon: '/profile.svg',
-					alt: 'history',
-					authAction: true,
-					statusLogin: false,
-					command: () => {
-						router.push('/history');
-					}
-				},
-				{
-					label: 'Выход',
-					icon: '/profile.svg',
-					alt: 'logout',
-					logout: true,
-					authAction: true,
-					statusLogin: false,
-					command: () => {
-						router.push('/');
-					}
-				},
-			]
-		}
-	])
 
 	/**
 	 * Отслеживание изменения статуса авторизации, в случае изменений перерисовываются пункты меню
 	 */
-watch(
-		() => authorised.value,
-		() => {
-				itemsMenubar.value.filter(el => {
-					if(el.profile){
-						el.items.map(elem => elem.statusLogin = !elem.statusLogin)
-					}
-				})
-		}
-)
+
+	const itemsMenubar = computed(() => authorised.value ? items.value.filter(el => el.isDisplayedOnAuth === true) : items.value.filter(el => el.isDisplayedOnAuth === false))
 
 	/**
 	 * Выход из аккаунта, удаление данных из localStorage, запуск логики authorised
 	 */
 	const logout = (e) => {
-		if(e.target.getAttribute('data-logout') || e.target.closest('[data-logout]')){
-			authorised.value = null
-			globalLogin.value = '';
-			localStorage.removeItem('tokenShoe')
-			localStorage.removeItem('login')
-			// localStorage.removeItem('password')
-		}
+		authorised.value = null
+		globalLogin.value = '';
+		localStorage.removeItem('tokenShoe')
+		localStorage.removeItem('login')
+
+		setTimeout(() => {
+			const command = () => {
+				router.push('/')
+			}
+
+			command()
+		}, 0)
 	}
 
 
@@ -120,158 +73,123 @@ watch(
 <template>
 
 	<header class="header">
-		<div class="container">
-			<div class="header__wrap">
+		<div class="">
 
-				<div class="header__content">
+			<v-overlay v-model="overlay"></v-overlay>
+			<Basket v-if="overlay"/>
 
-					<Menubar :model="itemsMenubar">
-						<template #start>
-							<div class="header__link">
-								<router-link to="/">
-									<div class="header__logo">
-										<div class="header__logo-img">
-											<img src="/logo.png" alt="logo">
-										</div>
-										<div class="header__logo-content">
-											<h4 class="header__logo-title">REACT SNEAKERS</h4>
-											<p class="header__logo-description">Магазин лучших кроссовок</p>
-										</div>
+			<v-card>
+				<v-layout>
+
+					<v-app-bar
+							color="#fff"
+							prominent
+							height="80"
+							:absolute="false"
+							style="position: relative"
+					>
+
+						<router-link to="/" class="header__logo-link">
+							<v-img
+									max-width="40"
+									width="40"
+									height="40"
+									src="/logo.png"
+							></v-img>
+
+							<v-toolbar-title>
+								<template #text>
+									<div class="header__logo-content">
+										<h4 class="header__logo-title">REACT SNEAKERS</h4>
+										<p class="header__logo-description">Магазин лучших кроссовок</p>
 									</div>
-								</router-link>
-							</div>
-						</template>
-						<template #item="{ item, props, hasSubmenu }">
-							<router-link v-if="item.route && !item.authAction" v-slot="{ href, navigate }" :to="item.route" custom>
-								<a v-ripple :href="href" v-bind="props.action" @click="navigate">
-									<img :src="item.icon" :alt="item.alt">
-									<span class="ml-2">{{ item.label }}</span>
-								</a>
-							</router-link>
-							<a v-else-if="item.priceClass" v-ripple :href="item.url" :target="item.target" v-bind="props.action"  @click="visibleRight = true">
-								<img :src="item.icon" :alt="item.alt">
-								<span class="ml-2" :class="item.priceClass ? 'price-class' : ''">{{ item.label }}</span>
-								<span v-if="hasSubmenu" class="pi pi-fw pi-angle-down ml-2" />
-							</a>
-							<a v-else-if="item.authAction && item.statusLogin" v-ripple :href="item.url" :target="item.target" v-bind="props.action" @click="logout" :data-logout="item.logout">
-								<p>555</p>
-									<img :src="item.icon" :alt="item.alt">
-									<span class="ml-2" >{{ item.label }}</span>
-									<span v-if="hasSubmenu" class="pi pi-fw pi-angle-down ml-2" />
-							</a>
-							<a v-else-if="!item.authAction && !item.statusLogin" v-ripple :href="item.url" :target="item.target" v-bind="props.action">
-									<img :src="item.icon" :alt="item.alt">
-									<span class="ml-2">{{ globalLogin || item.label }}</span>
-									<span v-if="hasSubmenu" class="pi pi-fw pi-angle-down ml-2" />
-							</a>
-						</template>
+								</template>
+							</v-toolbar-title>
+						</router-link>
 
-					</Menubar>
+						<v-spacer></v-spacer>
 
-				</div>
+						<v-btn min-width="40" min-height="40" @click="overlay = !overlay">
+							<v-icon size="22">mdi-basket-outline</v-icon>
+						</v-btn>
 
-				<Sidebar v-model:visible="visibleRight" header="Right Sidebar" position="right">
-					<Basket/>
-				</Sidebar>
+						<router-link to="/about" class="header__logo-link">
+							<v-btn min-width="40" min-height="40">
+								<v-icon size="22">mdi-heart-outline</v-icon>
+							</v-btn>
+						</router-link>
 
-			</div>
+						<v-menu>
+							<template v-slot:activator="{ props }">
+								<v-btn class="c-btn-icon" min-width="40" min-height="40" v-bind="props">
+									<template v-slot:prepend>
+										<p>{{ globalLogin }}</p>
+									</template>
+									<v-icon size="22">mdi-dots-vertical</v-icon>
+								</v-btn>
+							</template>
+
+							<v-list class="header-list">
+								<v-list-item
+										v-for="(item, i) in itemsMenubar"
+										:key="i"
+								>
+									<router-link :to="item.route" @click="item.type === 'exit' ? logout() : '' " class="header__logo-link">
+										<v-list-item-title>{{ item.title }}</v-list-item-title>
+									</router-link>
+
+								</v-list-item>
+							</v-list>
+						</v-menu>
+
+					</v-app-bar>
+
+				</v-layout>
+			</v-card>
+
 		</div>
 
 	</header>
 </template>
 
 <style lang="scss">
-	.header{
-		padding: 43px 0;
-		//border-bottom: 1px solid #EAEAEA;
-		@media screen and (max-width: 1199px) {
-			padding: 30px 0;
-		}
-		@media screen and (max-width: 576px) {
-			padding: 20px 0;
-		}
-		&__content{
-			width: 100%;
-		}
-		&__link a{
-			text-decoration: none;
-			display: inline-block;
-		}
-		&__wrap{
-			display: flex;
-			align-items: center;
-		}
-		&__logo{
-			display: flex;
-			align-items: center;
-		}
-		&__logo-img{
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			flex-shrink: 0;
-			margin-right: 16px;
-			@media screen and (max-width: 576px) {
-				margin-right: 10px;
-			}
-		}
-		&__logo-img img{
-			width: 40px;
-			height: 40px;
-		}
-		&__logo-title {
-			color: #000;
-			font-size: 20px;
-			font-weight: bold;
-			text-decoration: none;
-			margin-bottom: 7px;
-			@media screen and (max-width: 576px) {
-				font-size: 18px;
-			}
-		}
-		&__logo-description{
-			color: #9D9D9D;
-			font-size: 14px;
-		}
-		&__link{
-			@media screen and (max-width: 576px) {
-				margin-right: 10px;
-			}
-		}
-		&__content .p-menubar{
-			display: flex;
-			width: 100%;
-			justify-content: space-between;
-		}
-		&__content .p-menuitem{
-			margin-right: 20px;
-			z-index: 1000;
-			@media screen and (max-width: 1199px) {
-				margin-right: 10px;
-			}
-			@media screen and (max-width: 960px) {
-				margin-right: 0;
-			}
-			&:last-child{
-				margin-right: 0;
-			}
-		}
-		&__content .p-menuitem .p-menuitem-link {
-			padding: 10px 5px;
-		}
-		&__content .p-menuitem .p-menuitem-link img{
-			margin-right: 8px;
-			width: 20px;
-			height: 20px;
-		}
-		&__content .p-menuitem .p-menuitem-link  span {
-			color: #5C5C5C;
-			font-size: 14px;
+  .header{
+	  position: sticky;
+	  top: 0;
+	  z-index: 1000;
+  }
+	header.v-toolbar{
+		padding: 0 60px!important;
+	}
+	.v-toolbar-title{
+		line-height: 21px;
+		flex: 1 1 auto;
+	}
+	.c-btn-icon {
+		text-transform: none;
+	}
+	.header__logo-link {
+		display: flex;
+		align-items: center;
+		text-decoration: none;
+		color: inherit;
+	}
+	.header__logo-link .v-img {
+		margin-right: 20px;
+	}
+	.header-list {
+		.v-list-item{
 			transition: all ease .2s;
+			padding: 0!important;
+			height: auto;
+			min-width: auto;
+			min-height: auto;
+			&:hover{
+				background-color: #E0E0E0;
+			}
 		}
-		&__content .p-menuitem .p-menuitem-link .price-class {
-			color: #5C5C5C;
-			font-weight: 600;
+		.header__logo-link{
+			padding: 10px;
 		}
 	}
 </style>
