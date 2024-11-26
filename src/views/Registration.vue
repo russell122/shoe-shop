@@ -25,8 +25,8 @@ const userAlreadyExists = ref(false)
 
 const {values, errors, defineField, validate, handleSubmit, handleReset } = useForm({
 	validationSchema: yup.object({
-		login: yup.string().min(3, 'Логин должен минимум 3 символа').max(20, 'Слишком длинный логин').required('Введите логин'),
-		password: yup.string().min(6, 'Пароль должен быть минимум 6 символов').max(20, 'Слишком длинный пароль').required('Введите пароль'),
+		login: yup.string().min(1, 'Логин должен минимум 3 символа').max(20, 'Слишком длинный логин').required('Введите логин'),
+		password: yup.string().min(1, 'Пароль должен быть минимум 6 символов').max(20, 'Слишком длинный пароль').required('Введите пароль'),
 		email: yup.string().email('Некорректная почта').required('Введите почту'),
 	})
 });
