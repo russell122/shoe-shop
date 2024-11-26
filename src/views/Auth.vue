@@ -25,8 +25,8 @@ const noSuchUser = ref(false)
 
 const {values, errors, defineField, validate, handleSubmit, handleReset } = useForm({
 	validationSchema: yup.object({
-		login: yup.string().min(3, 'Логин должен минимум 3 символа').max(20, 'Слишком длинный логин').required('Введите логин'),
-		password: yup.string().min(6, 'Пароль должен быть минимум 6 символов').max(20, 'Слишком длинный пароль').required('Введите пароль'),
+		login: yup.string().min(1, 'Логин должен минимум 3 символа').max(20, 'Слишком длинный логин').required('Введите логин'),
+		password: yup.string().min(1, 'Пароль должен быть минимум 6 символов').max(20, 'Слишком длинный пароль').required('Введите пароль'),
 	})
 });
 
@@ -69,7 +69,7 @@ const autorization = handleSubmit(async values => {
 					}
 
 					command()
-				}, 2000)
+				}, 0)
 
 				console.log("Успешный вход")
 				console.log(data)
@@ -151,13 +151,13 @@ const clearAuth = () => {
 			</v-btn>
 
 			<div v-auto-animate>
-				<v-alert
-						v-if="authorised"
-						text="Успешный вход"
-						title=""
-						type="success"
-						icon="mdi-balloon"
-				></v-alert>
+<!--				<v-alert-->
+<!--						v-if="authorised"-->
+<!--						text="Успешный вход"-->
+<!--						title=""-->
+<!--						type="success"-->
+<!--						icon="mdi-balloon"-->
+<!--				></v-alert>-->
 			</div>
 			<div v-auto-animate>
 				<v-alert
