@@ -1,27 +1,30 @@
 <script setup>
-	import { ref } from 'vue'
-	import Dropdown from 'primevue/dropdown';
+	import Card from "@/components/Card.vue";
 
-	const filterTypes = ref([
-		{type: 'Сначала дешевые', value: 'cheap'},
-		{type: 'Сначала дорогие', value: 'darlings'},
-	])
-	const selectFilterTypes = ref()
-
+	const props = defineProps({
+		cards: {
+      type: Array,
+      required: true,
+    },
+	})
 </script>
 
 <template>
 	<div class="cards">
 		<div class="container">
 			<div class="cards__wrap">
-				<div class="cards__descr">
-					<h3>Все кроссовки</h3>
-				</div>
-				<div class="cards__interaction">
-					<Dropdown v-model="selectFilterTypes" :options="filterTypes" optionLabel="type" placeholder="Тип сортировки" class="w-full md:w-14rem" />
-					{{selectFilterTypes}}
-				</div>
+				<Card v-for="card in cards" :key="card.id" :item="card"/>
 			</div>
 		</div>
 	</div>
 </template>
+
+<style scoped lang="scss">
+	.cards{
+		&__wrap{
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			gap: 1rem;
+		}
+	}
+</style>
