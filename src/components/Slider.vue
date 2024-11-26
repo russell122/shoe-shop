@@ -40,9 +40,9 @@ import { ref } from 'vue'
 		padding: 45px 0;
 	}
 	.mySwiper{
-		height: 400px;
+		height: 600px;
 		@media screen and (max-width: 768px) {
-			height: 250px;
+			height: 400px;
 		}
 		.swiper-button-prev, .swiper-button-next {
 			color: #3CC755;
