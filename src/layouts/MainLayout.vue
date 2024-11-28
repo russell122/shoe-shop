@@ -9,7 +9,8 @@ import {RouterView} from "vue-router";
 <template>
 	<Header/>
 
-	<router-view></router-view>
+	<RouterView/>
+
 	<Footer/>
 </template>
 
