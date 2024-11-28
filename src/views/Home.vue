@@ -5,25 +5,13 @@
 	import AllShoes from "@/components/AllShoes.vue";
 
 	import { useOtherStore } from '@/stores/other.js'
-	import {watch} from "vue";
 	import {useRouter} from "vue-router";
 
 	const otherStore = useOtherStore();
 
-	const { sliderData, dataRetrievalError } = storeToRefs(otherStore)
+	const { sliderData } = storeToRefs(otherStore)
 
 	const router = useRouter();
-
-	watch(
-			() => dataRetrievalError.value,
-			(newValue) => {
-				if(newValue){
-					router.push('/dataRetrievalError')
-				}
-			},
-	);
-
-
 
 </script>
 
