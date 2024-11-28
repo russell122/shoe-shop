@@ -27,17 +27,19 @@ const routes = [
   },
   {
     path: '/dataRetrievalError',
-    component: SimpleLayout,
-    children: [
-      { path: '', name: 'dataRetrievalError', component: DataRetrievalError }
-    ]
+    name: 'dataRetrievalError',
+    component: DataRetrievalError,
+    meta: {
+      layout: SimpleLayout
+    }
   },
   {
     path: '/:pathMatch(.*)*',
-    component: SimpleLayout,
-    children: [
-      { path: '', name: 'NotFound', component: NotFound }
-    ]
+    name: 'NotFound',
+    component: NotFound,
+    meta: {
+      layout: SimpleLayout
+    }
   }
 ];
 
