@@ -8,15 +8,32 @@
 
 	const otherStore = useOtherStore();
 
-	const { globalLogin, authorised } = storeToRefs(otherStore)
+	const { globalLogin, authorised, dataRetrievalError, transitionDataRetrievalError, overlay } = storeToRefs(otherStore)
+
+	import {useRouter} from "vue-router";
+	import Loader from "@/components/Loader.vue";
+
+	const router = useRouter();
 
 	/**
 	 * Проверяем при заходе на сайт авторизован ли уже пользователь, если да то запускается логика authorised
 	 */
-	onMounted(() => {
+	onMounted(async () => {
+		await otherStore.getSliderData();
+		await otherStore.getProductsData();
+
 		globalLogin.value = localStorage.getItem('login');
 		if(globalLogin.value){
 			authorised.value = true;
+		}
+
+		if(dataRetrievalError.value){
+			transitionDataRetrievalError.value = true;
+			localStorage.setItem('transitionDataRetrievalError', transitionDataRetrievalError.value)
+			await router.replace({name: 'dataRetrievalError'});
+		} else {
+			transitionDataRetrievalError.value = false;
+			localStorage.setItem('transitionDataRetrievalError', transitionDataRetrievalError.value)
 		}
 	})
 
@@ -24,9 +41,8 @@
 
 <template>
 	<div class="content">
-
-			<RouterView />
-
+		<Loader v-if="overlay"/>
+		<RouterView v-else/>
 	</div>
 
 </template>
