@@ -1,5 +1,5 @@
 <script setup>
-	import { ref, watch, computed } from 'vue'
+import {ref, watch, computed, onMounted} from 'vue'
 
 	import { RouterLink, useRouter } from 'vue-router'
 
@@ -11,60 +11,40 @@
 
 	const otherStore = useOtherStore();
 
-	const { authorised, globalLogin } = storeToRefs(otherStore)
+	const { authorised, globalLogin, displayedItems } = storeToRefs(otherStore)
+
+	const { updateDisplayedItems } = otherStore;
 
 	const price = ref(1205)
 	const visibleRight = ref(false)
 	const drawer = ref(null)
 	const overlay = ref(false)
-	const items = ref([
-		{
-			title: 'Вход',
-			value: 'Вход',
-			type: 'inlet',
-			isDisplayedOnAuth: false,
-			route: '/auth',
-		},
-		{
-			title: 'Регистрация',
-			value: 'Регистрация',
-			type: 'registration',
-			isDisplayedOnAuth: false,
-			route: '/registration',
-		},
-		{
-			title: 'Выход',
-			value: 'Выход',
-			isDisplayedOnAuth: true,
-			type: 'exit',
-			route: '/',
-		},
-	])
 
 	const router = useRouter();
 
-	/**
-	 * Отслеживание изменения статуса авторизации, в случае изменений перерисовываются пункты меню
-	 */
-
-	const itemsMenubar = computed(() => authorised.value ? items.value.filter(el => el.isDisplayedOnAuth === true) : items.value.filter(el => el.isDisplayedOnAuth === false))
 
 	/**
 	 * Выход из аккаунта, удаление данных из localStorage, запуск логики authorised
 	 */
-	const logout = (e) => {
+	const logout = async (e) => {
 		authorised.value = null
 		globalLogin.value = '';
 		localStorage.removeItem('tokenShoe')
 		localStorage.removeItem('login')
 
-		setTimeout(() => {
-			const command = () => {
-				router.push('/')
-			}
+		await router.push('/')
+	}
 
-			command()
-		}, 0)
+/**
+ * Открытие/закрытие меню
+ */
+	const onMenuToggle = (isVisible) => {
+		console.log(111)
+		console.log(displayedItems)
+		// console.log(displayedItems.value)
+		if (!isVisible) {
+			setTimeout(updateDisplayedItems, 300); // Задержка столько же сколько и время анимации(open-delay)
+		}
 	}
 
 
@@ -119,7 +99,7 @@
 							</v-btn>
 						</router-link>
 
-						<v-menu>
+						<v-menu @update:modelValue="onMenuToggle" :open-delay="300">
 							<template v-slot:activator="{ props }">
 								<v-btn class="c-btn-icon" min-width="40" min-height="40" v-bind="props">
 									<template v-slot:prepend>
@@ -131,7 +111,7 @@
 
 							<v-list class="header-list">
 								<v-list-item
-										v-for="(item, i) in itemsMenubar"
+										v-for="(item, i) in displayedItems"
 										:key="i"
 								>
 									<router-link :to="item.route" @click="item.type === 'exit' ? logout() : '' " class="header__logo-link">

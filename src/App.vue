@@ -9,6 +9,7 @@
 	const otherStore = useOtherStore();
 
 	const { globalLogin, authorised, dataRetrievalError, transitionDataRetrievalError, overlay } = storeToRefs(otherStore)
+	const { updateDisplayedItems } = otherStore;
 
 	import {useRouter} from "vue-router";
 	import Loader from "@/components/Loader.vue";
@@ -19,13 +20,18 @@
 	 * Проверяем при заходе на сайт авторизован ли уже пользователь, если да то запускается логика authorised
 	 */
 	onMounted(async () => {
+		console.log(888)
 		await otherStore.getSliderData();
 		await otherStore.getProductsData();
+		console.log(999)
 
 		globalLogin.value = localStorage.getItem('login');
 		if(globalLogin.value){
 			authorised.value = true;
+			console.log('Сделали авторизацию');
 		}
+
+		updateDisplayedItems();
 
 		if(dataRetrievalError.value){
 			transitionDataRetrievalError.value = true;

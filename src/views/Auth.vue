@@ -17,6 +17,7 @@ import { useOtherStore } from '@/stores/other.js'
 const otherStore = useOtherStore();
 
 const { authorised, globalLogin, overlay } = storeToRefs(otherStore)
+const { updateDisplayedItems } = otherStore
 
 const showPassword = ref(false);
 const loading = ref(false);
@@ -48,49 +49,47 @@ const autorization = handleSubmit(async values => {
 	authorisedError.value = false
 	overlay.value = true
 
-	setTimeout(async () => {
-		try {
-			const { data } = await axios.post('https://7402571ecc17c5c9.mokky.dev/auth', {
-				login: values.login,
-				password: values.password
-			})
+	return new Promise((resolve) => { // из-за setTimeout, без промиса код ждать не будет
+		setTimeout(async () => { // что бы было видно прелоадер (из-за быстрого ответа от сервера он не успевается отработать)
+			try {
+				const { data } = await axios.post('https://7402571ecc17c5c9.mokky.dev/auth', {
+					login: values.login,
+					password: values.password
+				})
 
-			if(data.token){
-				globalLogin.value = login.value;
-				authorised.value = true;
+				if(data.token){
+					globalLogin.value = login.value;
+					authorised.value = true;
 
-				localStorage.setItem('tokenShoe', data.token)
-				localStorage.setItem('login', login.value)
-				// localStorage.setItem('password', password.value)
+					localStorage.setItem('tokenShoe', data.token)
+					localStorage.setItem('login', login.value)
 
-				setTimeout(() => {
-					const command = () => {
-						router.push('/')
-					}
+					await router.push('/') // дождемся пока перейдет на главную страницу иначе будет подергивание
+					// после прелоадера вновь отобразится страница auth и резко главная, промис выше и await это фиксят
 
-					command()
-				}, 0)
+					console.log("Успешный вход")
+					console.log(data)
+					updateDisplayedItems();
+				} else {
+					console.log('Шляяяяяяпа')
+					authorisedError.value = true
+				}
+			} catch (error) {
+				console.log('Упали в кетч')
+				console.log(error)
+				if(error.response.status === 401) {
+					noSuchUser.value = true
+				} else {
+					authorisedError.value = true
+				}
 
-				console.log("Успешный вход")
-				console.log(data)
-			} else {
-				console.log('Шляяяяяяпа')
-				authorisedError.value = true
+			} finally {
+				overlay.value = false
+				resolve(); // Уведомляем, что выполнение завершено
 			}
-		} catch (error) {
-			console.log('Упали в кетч')
-			console.log(error)
-			if(error.response.status === 401) {
-				noSuchUser.value = true
-			} else {
-				authorisedError.value = true
-			}
+		}, 100)
 
-		} finally {
-			overlay.value = false
-		}
-	}, 2000)
-
+	})
 
 });
 
