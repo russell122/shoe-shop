@@ -13,16 +13,14 @@
 
 <template>
 	<div class="all-shoes">
-		<div class="container">
-			<div class="all-shoes__wrap">
-				<div class="all-shoes__descr">
-					<h1>Все кроссовки</h1>
-				</div>
-
-				<FilterSortSearchCard/>
-				<Cards :cards="productsData"/>
-
+		<div class="all-shoes__wrap">
+			<div class="all-shoes__descr">
+				<h1>Все кроссовки</h1>
 			</div>
+
+			<FilterSortSearchCard/>
+			<Cards :cards="productsData"/>
+
 		</div>
 	</div>
 </template>

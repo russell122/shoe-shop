@@ -11,10 +11,8 @@
 
 <template>
 	<div class="cards">
-		<div class="container">
-			<div class="cards__wrap">
-				<Card v-for="card in cards" :key="card.id" :item="card"/>
-			</div>
+		<div class="cards__wrap">
+			<Card v-for="card in cards" :key="card.id" :item="card"/>
 		</div>
 	</div>
 </template>
