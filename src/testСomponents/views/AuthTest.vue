@@ -20,7 +20,7 @@ const test = () => {
 
 <template>
 	<p>123</p>
-	<input v-model="email" v-bind="emailAttrs" @input="test"/>
+	<input v-model="email" placeholder="введите имейл" v-bind="emailAttrs" @input="test"/>
 
 	<pre>values: {{ values }}</pre>
 	<pre>errors: {{ errors }}</pre>
