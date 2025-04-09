@@ -69,6 +69,7 @@ const registration = handleSubmit(async values => {
 
 					localStorage.setItem('tokenShoe', data.token)
 					localStorage.setItem('login', login.value)
+					localStorage.setItem('user_id', data.id)
 
 					await router.push('/') // дождемся пока перейдет на главную страницу иначе будет подергивание
 					// после прелоадера вновь отобразится страница auth и резко главная, промис выше и await это фиксят
