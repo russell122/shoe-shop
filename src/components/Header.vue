@@ -1,175 +1,162 @@
 <script setup>
-import {ref, watch, computed, onMounted} from 'vue'
 
-	import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router';
 
-	import Basket from '@/components/Basket.vue'
+import { storeToRefs } from 'pinia';
 
-	import { storeToRefs } from 'pinia'
+import { useOtherStore } from '@/stores/other.js';
 
-	import { useOtherStore } from '@/stores/other.js'
+const otherStore = useOtherStore();
 
-	const otherStore = useOtherStore();
+const { authorised, globalLogin, displayedItems, basketOverlay, basketsData, bookmarkedData } = storeToRefs(otherStore);
 
-	const { authorised, globalLogin, displayedItems } = storeToRefs(otherStore)
+const { updateDisplayedItems } = otherStore;
 
-	const { updateDisplayedItems } = otherStore;
-
-	const price = ref(1205)
-	const visibleRight = ref(false)
-	const drawer = ref(null)
-	const overlay = ref(false)
-
-	const router = useRouter();
+const router = useRouter();
 
 
-	/**
-	 * Выход из аккаунта, удаление данных из localStorage, запуск логики authorised
-	 */
-	const logout = async (e) => {
-		authorised.value = null
-		globalLogin.value = '';
-		localStorage.removeItem('tokenShoe')
-		localStorage.removeItem('login')
+/**
+ * Выход из аккаунта, удаление данных из localStorage, запуск логики authorised
+ */
+const logout = async (e) => {
+  authorised.value = null;
+  globalLogin.value = '';
 
-		await router.push('/')
-	}
+  localStorage.clear();
+  basketsData.value = [];
+  bookmarkedData.value = [];
+
+  await router.push('/');
+};
 
 /**
  * Открытие/закрытие меню
  */
-	const onMenuToggle = (isVisible) => {
-		console.log(111)
-		console.log(displayedItems)
-		// console.log(displayedItems.value)
-		if (!isVisible) {
-			setTimeout(updateDisplayedItems, 300); // Задержка столько же сколько и время анимации(open-delay)
-		}
-	}
+const onMenuToggle = (isVisible) => {
+  console.log(111);
+  console.log(displayedItems);
+  // console.log(displayedItems.value)
+  if (!isVisible) {
+    setTimeout(updateDisplayedItems, 300); // Задержка столько же сколько и время анимации(open-delay)
+  }
+};
 
 
 </script>
 
 <template>
 
-	<header class="header">
-		<div class="">
+  <v-app-bar
+    color="#fff"
+    prominent
+    height="80"
+    scroll-threshold="80"
+  >
 
-			<v-overlay v-model="overlay"></v-overlay>
-			<Basket v-if="overlay"/>
+    <div class="container header__wrap">
+      <router-link to="/" class="header__logo-link text-decoration-none">
+        <v-img
+          max-width="40"
+          width="40"
+          height="40"
+          src="/logo.png"
+        ></v-img>
+        <v-toolbar-title>
+          <div class="header__logo-content">
+            <h4 class="header__logo-title">REACT SNEAKERS</h4>
+            <p class="header__logo-description">Магазин лучших кроссовок</p>
+          </div>
+        </v-toolbar-title>
+      </router-link>
 
-			<v-card>
-				<v-layout>
+      <v-spacer></v-spacer>
 
-					<v-app-bar
-							color="#fff"
-							prominent
-							height="80"
-							:absolute="false"
-							style="position: relative"
-					>
+      <!-- Остальные элементы шапки без изменений -->
+      <v-btn min-width="40" min-height="40" @click="basketOverlay = !basketOverlay">
+        <v-icon size="22">mdi-basket-outline</v-icon>
+      </v-btn>
 
-						<router-link to="/" class="header__logo-link">
-							<v-img
-									max-width="40"
-									width="40"
-									height="40"
-									src="/logo.png"
-							></v-img>
+      <router-link to="/about" class="text-decoration-none">
+        <v-btn min-width="40" min-height="40">
+          <v-icon size="22">mdi-heart-outline</v-icon>
+        </v-btn>
+      </router-link>
 
-							<v-toolbar-title>
-								<template #text>
-									<div class="header__logo-content">
-										<h4 class="header__logo-title">REACT SNEAKERS</h4>
-										<p class="header__logo-description">Магазин лучших кроссовок</p>
-									</div>
-								</template>
-							</v-toolbar-title>
-						</router-link>
+      <v-menu @update:modelValue="onMenuToggle" :open-delay="300">
+        <template v-slot:activator="{ props }">
+          <v-btn class="c-btn-icon" min-width="40" min-height="40" v-bind="props">
+            <template v-slot:prepend>
+              <p>{{ globalLogin }}</p>
+            </template>
+            <v-icon size="22">mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
 
-						<v-spacer></v-spacer>
+        <v-list class="header-list">
+          <v-list-item
+            v-for="(item, i) in displayedItems"
+            :key="i"
+          >
+            <router-link :to="item.route" @click="item.type === 'exit' ? logout() : '' "
+                         class="header__logo-link text-decoration-none">
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </router-link>
 
-						<v-btn min-width="40" min-height="40" @click="overlay = !overlay">
-							<v-icon size="22">mdi-basket-outline</v-icon>
-						</v-btn>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </div>
 
-						<router-link to="/about" class="header__logo-link">
-							<v-btn min-width="40" min-height="40">
-								<v-icon size="22">mdi-heart-outline</v-icon>
-							</v-btn>
-						</router-link>
+  </v-app-bar>
 
-						<v-menu @update:modelValue="onMenuToggle" :open-delay="300">
-							<template v-slot:activator="{ props }">
-								<v-btn class="c-btn-icon" min-width="40" min-height="40" v-bind="props">
-									<template v-slot:prepend>
-										<p>{{ globalLogin }}</p>
-									</template>
-									<v-icon size="22">mdi-dots-vertical</v-icon>
-								</v-btn>
-							</template>
 
-							<v-list class="header-list">
-								<v-list-item
-										v-for="(item, i) in displayedItems"
-										:key="i"
-								>
-									<router-link :to="item.route" @click="item.type === 'exit' ? logout() : '' " class="header__logo-link">
-										<v-list-item-title>{{ item.title }}</v-list-item-title>
-									</router-link>
-
-								</v-list-item>
-							</v-list>
-						</v-menu>
-
-					</v-app-bar>
-
-				</v-layout>
-			</v-card>
-
-		</div>
-
-	</header>
 </template>
 
 <style lang="scss">
-  .header{
-	  position: sticky;
-	  top: 0;
-	  z-index: 1000;
+
+.header__wrap {
+  height: 100%;
+  display: flex;
+}
+
+.v-toolbar-title {
+  line-height: 21px;
+  flex: 1 1 auto;
+}
+
+.c-btn-icon {
+  text-transform: none;
+}
+
+.header__logo-link {
+  display: flex;
+  align-items: center;
+}
+
+.text-decoration-none {
+  text-decoration: none;
+  color: inherit;
+}
+
+.header__logo-link .v-img {
+  margin-right: 20px;
+}
+
+.header-list {
+  .v-list-item {
+    transition: all ease .2s;
+    padding: 0 !important;
+    height: auto;
+    min-width: auto;
+    min-height: auto;
+
+    &:hover {
+      background-color: #E0E0E0;
+    }
   }
-	header.v-toolbar{
-		padding: 0 60px!important;
-	}
-	.v-toolbar-title{
-		line-height: 21px;
-		flex: 1 1 auto;
-	}
-	.c-btn-icon {
-		text-transform: none;
-	}
-	.header__logo-link {
-		display: flex;
-		align-items: center;
-		text-decoration: none;
-		color: inherit;
-	}
-	.header__logo-link .v-img {
-		margin-right: 20px;
-	}
-	.header-list {
-		.v-list-item{
-			transition: all ease .2s;
-			padding: 0!important;
-			height: auto;
-			min-width: auto;
-			min-height: auto;
-			&:hover{
-				background-color: #E0E0E0;
-			}
-		}
-		.header__logo-link{
-			padding: 10px;
-		}
-	}
+
+  .header__logo-link {
+    padding: 10px;
+  }
+}
 </style>
