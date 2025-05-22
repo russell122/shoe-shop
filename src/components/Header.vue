@@ -8,11 +8,28 @@ import { useOtherStore } from '@/stores/other.js';
 
 const otherStore = useOtherStore();
 
-const { authorised, globalLogin, displayedItems, basketOverlay, basketsData, bookmarkedData } = storeToRefs(otherStore);
+const {
+  authorised,
+  globalLogin,
+  displayedItems,
+  basketOverlay,
+  basketsData,
+  bookmarkedData,
+  drawer
+} = storeToRefs(otherStore);
 
 const { updateDisplayedItems } = otherStore;
 
 const router = useRouter();
+
+import { useDisplay } from 'vuetify';
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
+
+const { width } = useDisplay();
+
+const isMobile = computed(() => width.value <= 576);
+const basketButton = ref(null);
+const drawerButton = ref(null);
 
 
 /**
@@ -25,6 +42,9 @@ const logout = async (e) => {
   localStorage.clear();
   basketsData.value = [];
   bookmarkedData.value = [];
+
+  basketOverlay.value = false;
+  drawer.value = false;
 
   await router.push('/');
 };
@@ -41,6 +61,35 @@ const onMenuToggle = (isVisible) => {
   }
 };
 
+onMounted(async () => {
+  window.addEventListener('keyup', handleKeyUp);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keyup', handleKeyUp);
+});
+
+const handleKeyUp = (event) => {
+  if (event.key === 'Escape') {
+    if (basketOverlay.value) {
+      basketOverlay.value = false;
+      // Сбрасываем фокус с кнопки
+      nextTick(() => {
+        basketButton.value?.$el?.blur();
+      });
+    }
+
+    if (drawer.value) {
+      drawer.value = false;
+      // Сбрасываем фокус с кнопки
+      nextTick(() => {
+        drawerButton.value?.$el?.blur();
+      });
+    }
+
+  }
+};
+
 
 </script>
 
@@ -51,6 +100,7 @@ const onMenuToggle = (isVisible) => {
     prominent
     height="80"
     scroll-threshold="80"
+    style="position: fixed;"
   >
 
     <div class="container header__wrap">
@@ -71,40 +121,48 @@ const onMenuToggle = (isVisible) => {
 
       <v-spacer></v-spacer>
 
-      <!-- Остальные элементы шапки без изменений -->
-      <v-btn min-width="40" min-height="40" @click="basketOverlay = !basketOverlay">
-        <v-icon size="22">mdi-basket-outline</v-icon>
-      </v-btn>
-
-      <router-link to="/about" class="text-decoration-none">
-        <v-btn min-width="40" min-height="40">
-          <v-icon size="22">mdi-heart-outline</v-icon>
+      <template v-if="isMobile">
+        <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer" ref="drawerButton"></v-app-bar-nav-icon>
+      </template>
+      <template v-else>
+        <v-btn min-width="40" min-height="40" @click="basketOverlay = !basketOverlay" ref="basketButton">
+          <v-icon size="22">mdi-basket-outline</v-icon>
         </v-btn>
-      </router-link>
 
-      <v-menu @update:modelValue="onMenuToggle" :open-delay="300">
-        <template v-slot:activator="{ props }">
-          <v-btn class="c-btn-icon" min-width="40" min-height="40" v-bind="props">
-            <template v-slot:prepend>
-              <p>{{ globalLogin }}</p>
-            </template>
-            <v-icon size="22">mdi-dots-vertical</v-icon>
+        <router-link to="/about" class="text-decoration-none">
+          <v-btn min-width="40" min-height="40">
+            <v-icon size="22">mdi-heart-outline</v-icon>
           </v-btn>
-        </template>
+        </router-link>
 
-        <v-list class="header-list">
-          <v-list-item
-            v-for="(item, i) in displayedItems"
-            :key="i"
-          >
-            <router-link :to="item.route" @click="item.type === 'exit' ? logout() : '' "
-                         class="header__logo-link text-decoration-none">
-              <v-list-item-title>{{ item.title }}</v-list-item-title>
-            </router-link>
+        <v-menu @update:modelValue="onMenuToggle" :open-delay="300">
+          <template v-slot:activator="{ props }">
+            <v-btn class="c-btn-icon" min-width="40" min-height="40" v-bind="props">
+              <template v-slot:prepend>
+                <p>{{ globalLogin }}</p>
+              </template>
+              <v-icon size="22">mdi-dots-vertical</v-icon>
+            </v-btn>
+          </template>
 
-          </v-list-item>
-        </v-list>
-      </v-menu>
+          <v-list class="header-list">
+            <v-list-item
+              v-for="(item, i) in displayedItems"
+              :key="i"
+            >
+              <router-link :to="item.route" @click="item.type === 'exit' ? logout() : '' "
+                           class="header__logo-link text-decoration-none">
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+              </router-link>
+
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </template>
+
+      <!-- Остальные элементы шапки без изменений -->
+
+
     </div>
 
   </v-app-bar>
@@ -157,6 +215,24 @@ const onMenuToggle = (isVisible) => {
 
   .header__logo-link {
     padding: 10px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .header__logo-title, .header__logo-description {
+    font-size: 18px;
+  }
+  .header__logo-link .v-img {
+    margin-right: 10px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .header__logo-title, .header__logo-description {
+    font-size: 16px;
+  }
+  .header__logo-link .v-img {
+    margin-right: 5px;
   }
 }
 </style>

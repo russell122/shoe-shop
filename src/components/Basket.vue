@@ -6,34 +6,39 @@ import { useOtherStore } from '@/stores/other.js';
 const otherStore = useOtherStore();
 
 const { basketsData } = storeToRefs(otherStore);
+
+const { basketOverlay } = storeToRefs(otherStore);
 </script>
 
 <template>
-  <div class="basket">
-    <h1>Корзина</h1>
-    <div>
+
+
+  <v-navigation-drawer
+    v-model="basketOverlay"
+    temporary
+    location="right"
+    width="700"
+    class="basket"
+  >
+    <div class="basket__wrap">
+      <div class="basket__close">
+        <v-icon :icon="'mdi-plus'" @click="basketOverlay = !basketOverlay" />
+      </div>
+      <h1>Абоба</h1>
       <div v-for="basket in basketsData" :key="basket.id">
         <p>{{ basket.title }}</p>
       </div>
     </div>
-  </div>
+
+  </v-navigation-drawer>
+
 
 </template>
 
 <style scoped>
-.basket {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 100001;
-  background-color: white;
-  width: 500px;
-  height: 100%;
-}
-
-@media screen and (max-width: 576px) {
+@media screen and (max-width: 992px) {
   .basket {
-    width: 90%;
+    width: 100% !important;
   }
 }
 </style>

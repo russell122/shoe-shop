@@ -16,7 +16,7 @@ const router = useRouter();
 </script>
 
 <template>
-  <div class="home sect">
+  <div class="home">
     <div class="container">
       <Slider :data="sliderData" />
       <AllShoes />

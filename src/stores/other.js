@@ -14,6 +14,7 @@ export const useOtherStore = defineStore('other', () => {
   const user_id = ref();
   const overlay = ref(true);
   const basketOverlay = ref(false);
+  const drawer = ref(false);
   const dataRetrievalError = ref(false);
   const transitionDataRetrievalError = ref(false);
   const headerMenuItems = ref([
@@ -201,6 +202,7 @@ export const useOtherStore = defineStore('other', () => {
     user_id,
     overlay,
     basketOverlay,
+    drawer,
     displayedItems,
     getSliderData,
     getProductsData,

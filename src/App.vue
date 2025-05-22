@@ -3,11 +3,11 @@
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
 
-import { RouterView } from 'vue-router';
+import { RouterLink, RouterView } from 'vue-router';
 
 import { useOtherStore } from '@/stores/other.js';
 
-import { onMounted } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 const otherStore = useOtherStore();
@@ -19,8 +19,10 @@ const {
   transitionDataRetrievalError,
   overlay,
   basketOverlay,
+  drawer,
   basketsData,
-  bookmarkedData
+  bookmarkedData,
+  displayedItems
 } = storeToRefs(otherStore);
 const { updateDisplayedItems } = otherStore;
 
@@ -29,6 +31,34 @@ import Loader from '@/components/Loader.vue';
 import Basket from '@/components/Basket.vue';
 
 const router = useRouter();
+
+import { useDisplay } from 'vuetify';
+
+const { width } = useDisplay();
+
+const isMobile = ref();
+
+watch(width, (newValue) => {
+  isMobile.value = newValue;
+
+  // if (newValue <= 576) {
+  //   isMobile.value = true;
+  //   if (basketOverlay.value) {
+  //     drawer.value = true;
+  //   }
+  //   basketOverlay.value = false;
+  //
+  //
+  // } else {
+  //   isMobile.value = false;
+  //   if (drawer.value) {
+  //     basketOverlay.value = true;
+  //   }
+  //   drawer.value = false;
+  // }
+}, {
+  immediate: true
+});
 
 /**
  * Проверяем при заходе на сайт авторизован ли уже пользователь, если да то запускается логика authorised
@@ -76,41 +106,113 @@ window.addEventListener('storage', async (event) => {
   }
 });
 
+const items = ref([
+  {
+    title: 'Foo',
+    value: 'foo'
+  },
+  {
+    title: 'Bar',
+    value: 'bar'
+  },
+  {
+    title: 'Fizz',
+    value: 'fizz'
+  },
+  {
+    title: 'Buzz',
+    value: 'buzz'
+  }
+]);
+
+const openBasket = () => {
+  basketOverlay.value = true;
+  drawer.value = !drawer.value;
+};
+
+/**
+ * Открытие/закрытие меню
+ */
+const onMenuToggle = (isVisible) => {
+  if (!isVisible) {
+    setTimeout(updateDisplayedItems, 300); // Задержка столько же сколько и время анимации(open-delay)
+  }
+};
+
 </script>
 
 <template>
   <v-app>
-    <!-- Полноэкранный лоадер -->
+
     <Loader v-if="overlay" fullscreen />
 
-    <!-- Основной контент -->
     <template v-else>
-      <!--      <div class="content">-->
-      <!-- Header ДОЛЖЕН быть вне v-main -->
-      <Header />
-
       <v-layout class="layout">
 
-        <v-main>
+        <Header />
 
-          <!-- Корзина с оверлеем -->
-          <v-overlay
-            v-model="basketOverlay"
-            class="basket-overlay"
+        <template v-if="isMobile">
+          <v-navigation-drawer
+            v-model="drawer"
+            temporary
+            location="right"
           >
-            <Basket v-if="basketOverlay" />
-          </v-overlay>
+            <!--            <v-list-item>-->
+            <!--            </v-list-item>-->
+
+            <!--            <v-list-->
+            <!--              :items="items"-->
+            <!--            ></v-list>-->
+
+            <v-btn min-width="40" min-height="40" @click="openBasket" ref="basketButton">
+              <v-icon size="22">mdi-basket-outline</v-icon>
+            </v-btn>
+
+            <router-link to="/about" class="text-decoration-none">
+              <v-btn min-width="40" min-height="40">
+                <v-icon size="22">mdi-heart-outline</v-icon>
+              </v-btn>
+            </router-link>
+
+            <v-menu @update:modelValue="onMenuToggle" :open-delay="300">
+              <template v-slot:activator="{ props }">
+                <v-btn class="c-btn-icon" min-width="40" min-height="40" v-bind="props">
+                  <template v-slot:prepend>
+                    <p>{{ globalLogin }}</p>
+                  </template>
+                  <v-icon size="22">mdi-dots-vertical</v-icon>
+                </v-btn>
+              </template>
+
+              <v-list class="header-list">
+                <v-list-item
+                  v-for="(item, i) in displayedItems"
+                  :key="i"
+                >
+                  <router-link :to="item.route" @click="item.type === 'exit' ? logout() : '' "
+                               class="header__logo-link text-decoration-none">
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  </router-link>
+
+                </v-list-item>
+              </v-list>
+            </v-menu>
 
 
-          <!-- Основной контент -->
+          </v-navigation-drawer>
+        </template>
+
+        <Basket v-if="basketOverlay" />
+
+        <v-main>
           <RouterView />
-          <Footer />
         </v-main>
+
+        <Footer />
+
       </v-layout>
-
-
-      <!--      </div>-->
     </template>
+
   </v-app>
 </template>
 
@@ -121,17 +223,8 @@ window.addEventListener('storage', async (event) => {
   box-sizing: border-box;
 }
 
-#app {
-  display: flex;
+.layout {
   flex-direction: column;
-  height: 100%;
-}
-
-.content {
-  //position: relative;
-  //height: 100%;
-  //display: flex;
-  //flex-direction: column;
 }
 
 .container {
@@ -184,34 +277,5 @@ window.addEventListener('storage', async (event) => {
 .p-float-label:has(input:focus) label, .p-float-label:has(input.p-filled) label, .p-float-label:has(input:-webkit-autofill) label, .p-float-label:has(textarea:focus) label, .p-float-label:has(textarea.p-filled) label, .p-float-label:has(.p-inputwrapper-focus) label, .p-float-label:has(.p-inputwrapper-filled) label {
   top: -0.01rem;
   font-size: 12px;
-}
-
-.v-main {
-  padding-top: 0;
-}
-
-.layout {
-  padding-top: 80px;
-  overflow: auto !important;
-  //z-index: 1007 !important;
-}
-
-.basket-overlay .v-overlay__content {
-  contain: none;
-}
-
-.home {
-  //flex: 1 1 auto;
-}
-
-.v-main {
-  display: flex;
-  flex-direction: column;
-}
-
-.sect {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
 }
 </style>
