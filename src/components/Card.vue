@@ -18,13 +18,13 @@ const props = defineProps({
   }
 });
 
-const { addToBasket, requestError: basketError } = useBasket();
-const { addToBookmarks, requestError: bookmarkError } = useBookmarks();
+const { addOrRemove: addOrRemoveBasket, requestError: basketError } = useBasket();
+const { addOrRemove: addOrRemoveBookmarks, requestError: bookmarkError } = useBookmarks();
 
 const requestError = computed(() => basketError.value || bookmarkError.value);
 
 const handleClickAddToBasket = async (item) => {
-  await addToBasket(item);
+  await addOrRemoveBasket(item);
 };
 </script>
 
@@ -45,7 +45,7 @@ const handleClickAddToBasket = async (item) => {
         <div
           class="card__heart"
           :class="bookmarkedItem?.uniqueId ? 'active' : ''"
-          @click="addToBookmarks(item)"
+          @click="addOrRemoveBookmarks(item)"
         >
           <v-icon :icon="bookmarkedItem?.uniqueId ? 'mdi-heart' : 'mdi-heart-outline'" />
         </div>
