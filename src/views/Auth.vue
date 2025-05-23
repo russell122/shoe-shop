@@ -13,6 +13,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 import { useOtherStore } from '@/stores/other.js';
+import { API_ENDPOINTS } from '@/config';
 
 const otherStore = useOtherStore();
 
@@ -52,7 +53,7 @@ const autorization = handleSubmit(async values => {
   return new Promise((resolve) => { // из-за setTimeout, без промиса код ждать не будет
     setTimeout(async () => { // что бы было видно прелоадер (из-за быстрого ответа от сервера он не успевается отработать)
       try {
-        const { data } = await axios.post('https://7402571ecc17c5c9.mokky.dev/auth', {
+        const { data } = await axios.post(API_ENDPOINTS.auth, {
           login: values.login,
           password: values.password
         });

@@ -2,6 +2,7 @@ import { ref, computed, onMounted } from 'vue';
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { resolve } from 'chart.js/helpers';
+import { API_ENDPOINTS } from '@/config';
 
 export const useOtherStore = defineStore('other', () => {
 
@@ -62,7 +63,7 @@ export const useOtherStore = defineStore('other', () => {
       setTimeout(async () => { // что бы было видно прелоадер
         try {
           console.log('Запрос на данные слайдера начался');
-          const { data } = await axios.get('https://7402571ecc17c5c9.mokky.dev/shoe-slider');
+          const { data } = await axios.get(API_ENDPOINTS.slider);
           sliderData.value = data;
           dataRetrievalError.value = false;
           console.log('Запрос на данные слайдера завершен');
@@ -81,7 +82,7 @@ export const useOtherStore = defineStore('other', () => {
       setTimeout(async () => { // что бы было видно прелоадер
         try {
           console.log('Запрос на данные продуктов начался');
-          const { data } = await axios.get('https://7402571ecc17c5c9.mokky.dev/products');
+          const { data } = await axios.get(API_ENDPOINTS.products);
           productsData.value = data;
           dataRetrievalError.value = false;
           console.log('Запрос на данные продуктов завершен');
@@ -102,7 +103,7 @@ export const useOtherStore = defineStore('other', () => {
         try {
           console.log('Запрос за корзиной начался');
           user_id.value = localStorage.getItem('user_id');
-          const { data } = await axios.get(`https://7402571ecc17c5c9.mokky.dev/baskets?user_id=${user_id.value}`);
+          const { data } = await axios.get(`${API_ENDPOINTS.baskets}?user_id=${user_id.value}`);
           console.log('Абоба');
           console.log(data);
 
@@ -122,7 +123,7 @@ export const useOtherStore = defineStore('other', () => {
               return acc;
             }, []);
 
-            await axios.patch(`https://7402571ecc17c5c9.mokky.dev/baskets`, basketsData.value);
+            await axios.patch(API_ENDPOINTS.baskets, basketsData.value);
 
           } else {
             basketsData.value = data;
@@ -150,7 +151,7 @@ export const useOtherStore = defineStore('other', () => {
           console.log(anonymBookmarked);
           console.log('Запрос за избранными товарами начался');
           user_id.value = localStorage.getItem('user_id');
-          const { data } = await axios.get(`https://7402571ecc17c5c9.mokky.dev/bookmarked?user_id=${user_id.value}`);
+          const { data } = await axios.get(`${API_ENDPOINTS.bookmarked}?user_id=${user_id.value}`);
 
           console.log('Избранные товары');
           console.log(data);
@@ -170,7 +171,7 @@ export const useOtherStore = defineStore('other', () => {
               return acc;
             }, []);
 
-            await axios.patch(`https://7402571ecc17c5c9.mokky.dev/bookmarked`, bookmarkedData.value);
+            await axios.patch(API_ENDPOINTS.bookmarked, bookmarkedData.value);
 
           } else {
             bookmarkedData.value = data;

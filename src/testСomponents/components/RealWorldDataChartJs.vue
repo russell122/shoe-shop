@@ -21,7 +21,7 @@ const data = computed(() => ({
 
 const getChartData = async () => {
 	try {
-		const { data } = await axios.get('https://7402571ecc17c5c9.mokky.dev/chart-data');
+		const { data } = await axios.get(API_ENDPOINTS.chart);
 
 		chartData.value = data;
 
