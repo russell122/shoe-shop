@@ -14,6 +14,7 @@ const router = useRouter();
 
 import { useOtherStore } from '@/stores/other.js';
 import { API_ENDPOINTS } from '@/config';
+import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
 
 const otherStore = useOtherStore();
 
