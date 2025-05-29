@@ -2,6 +2,8 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { storeToRefs } from 'pinia';
 
+import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
+
 export function useStorageList({ 
   store, 
   dataKey, 
@@ -30,7 +32,7 @@ export function useStorageList({
       requestError.value = true;
     } finally {
       if (!requestError.value) {
-        localStorage.setItem(localStorageKey, JSON.stringify(data.value));
+        setLocalStorage(localStorageKey, data.value);
       }
       setTimeout(() => { requestError.value = false; }, 1000);
     }
@@ -43,7 +45,7 @@ export function useStorageList({
     } else {
       data.value.push(getNewItem(item, user_id.value));
     }
-    localStorage.setItem(localStorageKey, JSON.stringify(data.value));
+    setLocalStorage(localStorageKey, data.value);
   };
 
   const removeRemote = async (item) => {

@@ -3,13 +3,14 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 import { resolve } from 'chart.js/helpers';
 import { API_ENDPOINTS } from '@/config';
+import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
 
 export const useOtherStore = defineStore('other', () => {
 
   const sliderData = ref([]);
   const productsData = ref([]);
-  const basketsData = ref([]);
-  const bookmarkedData = ref([]);
+  const basketsData = ref(getLocalStorage('baskets', []));
+  const bookmarkedData = ref(getLocalStorage('bookmarked', []));
   const authorised = ref(null);
   const globalLogin = ref();
   const user_id = ref();
@@ -102,7 +103,7 @@ export const useOtherStore = defineStore('other', () => {
       setTimeout(async () => {
         try {
           console.log('Запрос за корзиной начался');
-          user_id.value = localStorage.getItem('user_id');
+          user_id.value = getLocalStorage('user_id');
           const { data } = await axios.get(`${API_ENDPOINTS.baskets}?user_id=${user_id.value}`);
           console.log('Абоба');
           console.log(data);
@@ -129,6 +130,8 @@ export const useOtherStore = defineStore('other', () => {
             basketsData.value = data;
           }
 
+          setLocalStorage('baskets', basketsData.value )
+
           console.log('ДЕБАГЕР');
           console.log(basketsData);
           // console.log(basketsData.value)
@@ -150,7 +153,7 @@ export const useOtherStore = defineStore('other', () => {
         try {
           console.log(anonymBookmarked);
           console.log('Запрос за избранными товарами начался');
-          user_id.value = localStorage.getItem('user_id');
+          user_id.value = getLocalStorage('user_id');
           const { data } = await axios.get(`${API_ENDPOINTS.bookmarked}?user_id=${user_id.value}`);
 
           console.log('Избранные товары');
@@ -176,6 +179,9 @@ export const useOtherStore = defineStore('other', () => {
           } else {
             bookmarkedData.value = data;
           }
+
+          setLocalStorage('bookmarked', bookmarkedData.value);
+
           console.log(bookmarkedData.value);
           dataRetrievalError.value = false;
         } catch (error) {

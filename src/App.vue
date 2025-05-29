@@ -10,6 +10,8 @@ import { useOtherStore } from '@/stores/other.js';
 import { computed, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
+
 const otherStore = useOtherStore();
 
 const {
@@ -64,7 +66,7 @@ watch(width, (newValue) => {
  * Проверяем при заходе на сайт авторизован ли уже пользователь, если да то запускается логика authorised
  */
 onMounted(async () => {
-  globalLogin.value = localStorage.getItem('login');
+  globalLogin.value = getLocalStorage('login');
   if (globalLogin.value) {
     authorised.value = true;
     console.log('Сделали авторизацию');
@@ -75,15 +77,8 @@ onMounted(async () => {
   await otherStore.getProductsData();
   if (authorised.value) {
     await otherStore.getBasketsData();
-    localStorage.setItem('baskets', JSON.stringify(basketsData.value));
-
     await otherStore.getBookmarkedData();
-    localStorage.setItem('bookmarked', JSON.stringify(bookmarkedData.value));
-
     console.log(666);
-  } else {
-    basketsData.value = JSON.parse(localStorage.getItem('baskets')) ?? [];
-    bookmarkedData.value = JSON.parse(localStorage.getItem('bookmarked') ?? []);
   }
   console.log(999);
 
@@ -91,18 +86,18 @@ onMounted(async () => {
 
   if (dataRetrievalError.value) {
     transitionDataRetrievalError.value = true;
-    localStorage.setItem('transitionDataRetrievalError', transitionDataRetrievalError.value);
+    setLocalStorage('transitionDataRetrievalError', transitionDataRetrievalError.value);
     await router.replace({ name: 'dataRetrievalError' });
   } else {
     transitionDataRetrievalError.value = false;
-    localStorage.setItem('transitionDataRetrievalError', transitionDataRetrievalError.value);
+    setLocalStorage('transitionDataRetrievalError', transitionDataRetrievalError.value);
   }
 });
 
 window.addEventListener('storage', async (event) => {
   if (event.key === 'baskets' || event.key === 'bookmarked') {
-    basketsData.value = JSON.parse(localStorage.getItem('baskets')) ?? [];
-    bookmarkedData.value = JSON.parse(localStorage.getItem('bookmarked')) ?? [];
+    basketsData.value = getLocalStorage('baskets', []);
+    bookmarkedData.value = getLocalStorage('bookmarked', []);
   }
 });
 

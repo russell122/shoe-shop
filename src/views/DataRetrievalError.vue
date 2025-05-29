@@ -4,13 +4,15 @@ import { useOtherStore } from '@/stores/other.js'
 import {storeToRefs} from "pinia";
 import {useRouter} from "vue-router";
 
+import { getLocalStorage } from '@/utils/localStorage';
+
 const otherStore = useOtherStore();
 
 const { dataRetrievalError, transitionDataRetrievalError } = storeToRefs(otherStore)
 
 const router = useRouter();
 
-if(!dataRetrievalError.value && localStorage.getItem('transitionDataRetrievalError')){
+if(!dataRetrievalError.value && getLocalStorage('transitionDataRetrievalError')){
 	router.push('/')
 }
 

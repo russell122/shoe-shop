@@ -62,9 +62,9 @@ const autorization = handleSubmit(async values => {
           globalLogin.value = login.value;
           authorised.value = true;
 
-          localStorage.setItem('tokenShoe', data.token);
-          localStorage.setItem('login', login.value);
-          localStorage.setItem('user_id', data.data.id);
+          setLocalStorage('tokenShoe', data.token);
+          setLocalStorage('login', login.value);
+          setLocalStorage('user_id', data.data.id); 
 
           await router.push('/'); // дождемся пока перейдет на главную страницу иначе будет подергивание
           // после прелоадера вновь отобразится страница auth и резко главная, промис выше и await это фиксят
@@ -72,15 +72,15 @@ const autorization = handleSubmit(async values => {
           console.log('Успешный вход');
           console.log(data);
 
-          const anonimBaskets = JSON.parse(localStorage.getItem('baskets')) ?? [];
-          const anonimBookmarked = JSON.parse(localStorage.getItem('bookmarked')) ?? [];
+          const anonimBaskets = getLocalStorage('baskets', []);
+          const anonimBookmarked = getLocalStorage('bookmarked', []);
 
           updateDisplayedItems();
           await otherStore.getBasketsData(anonimBaskets);
-          localStorage.setItem('baskets', JSON.stringify(basketsData.value));
+          setLocalStorage('baskets', basketsData.value);
 
           await otherStore.getBookmarkedData(anonimBookmarked);
-          localStorage.setItem('bookmarked', JSON.stringify(bookmarkedData.value));
+          setLocalStorage('bookmarked', bookmarkedData.value);
 
         } else {
           console.log('Шляяяяяяпа');
