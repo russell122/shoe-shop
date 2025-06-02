@@ -15,3 +15,11 @@ export function setLocalStorage(key, value) {
         console.error('Error setting localStorage item:', error);
     }
 }
+
+export function removeLocalStorage(key) {
+    try {
+        localStorage.removeItem(key);
+    } catch(error) {
+        console.error('Error removing localStorage item:', error);
+    }
+}
