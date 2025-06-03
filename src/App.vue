@@ -6,6 +6,7 @@ import Footer from '@/components/Footer.vue';
 import { RouterLink, RouterView } from 'vue-router';
 
 import { useOtherStore } from '@/stores/other.js';
+import { useUiStore } from '@/stores/uiStore.js';
 
 import { computed, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -13,20 +14,20 @@ import { storeToRefs } from 'pinia';
 import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
 
 const otherStore = useOtherStore();
+const uiStore = useUiStore();
 
 const {
   globalLogin,
   authorised,
   dataRetrievalError,
   transitionDataRetrievalError,
-  overlay,
-  basketOverlay,
-  drawer,
   basketsData,
   bookmarkedData,
   displayedItems
 } = storeToRefs(otherStore);
 const { updateDisplayedItems } = otherStore;
+
+const { drawer, overlay, basketOverlay } = storeToRefs(uiStore);
 
 import { useRouter } from 'vue-router';
 import Loader from '@/components/Loader.vue';

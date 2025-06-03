@@ -2,10 +2,12 @@
 import { storeToRefs } from 'pinia'
 
 import { useOtherStore } from '@/stores/other.js'
+import { useUiStore } from '@/stores/uiStore.js'
 
 const otherStore = useOtherStore();
+const uiStore = useUiStore();
 
-const { overlay } = storeToRefs(otherStore)
+const { overlay } = storeToRefs(uiStore);
 
 </script>
 

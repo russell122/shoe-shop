@@ -2,12 +2,14 @@
 import { storeToRefs } from 'pinia';
 
 import { useOtherStore } from '@/stores/other.js';
+import { useUiStore } from '@/stores/uiStore.js';
 
 const otherStore = useOtherStore();
+const uiStore = useUiStore();
+
+const { basketOverlay } = storeToRefs(uiStore);
 
 const { basketsData } = storeToRefs(otherStore);
-
-const { basketOverlay } = storeToRefs(otherStore);
 </script>
 
 <template>

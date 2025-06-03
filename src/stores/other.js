@@ -5,6 +5,12 @@ import { resolve } from 'chart.js/helpers';
 import { API_ENDPOINTS } from '@/config';
 import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
 
+import { useUiStore } from '@/stores/uiStore.js';
+
+const uiStore = useUiStore();
+
+const { overlay } = storeToRefs(uiStore);
+
 export const useOtherStore = defineStore('other', () => {
 
   const sliderData = ref([]);
@@ -14,9 +20,6 @@ export const useOtherStore = defineStore('other', () => {
   const authorised = ref(null);
   const globalLogin = ref();
   const user_id = ref();
-  const overlay = ref(true);
-  const basketOverlay = ref(false);
-  const drawer = ref(false);
   const dataRetrievalError = ref(false);
   const transitionDataRetrievalError = ref(false);
   const headerMenuItems = ref([
@@ -207,9 +210,6 @@ export const useOtherStore = defineStore('other', () => {
     authorised,
     globalLogin,
     user_id,
-    overlay,
-    basketOverlay,
-    drawer,
     displayedItems,
     getSliderData,
     getProductsData,

@@ -5,18 +5,20 @@ import { RouterLink, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
 import { useOtherStore } from '@/stores/other.js';
+import { useUiStore } from '@/stores/uiStore.js';
 
 const otherStore = useOtherStore();
+const uiStore = useUiStore();
 
 const {
   authorised,
   globalLogin,
   displayedItems,
-  basketOverlay,
   basketsData,
-  bookmarkedData,
-  drawer
+  bookmarkedData
 } = storeToRefs(otherStore);
+
+const { drawer, basketOverlay } = storeToRefs(uiStore);
 
 const { updateDisplayedItems } = otherStore;
 
