@@ -13,13 +13,18 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 import { useOtherStore } from '@/stores/other.js';
+import { useUiStore } from '@/stores/uiStore.js';
+
 import { API_ENDPOINTS } from '@/config';
 import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
 
 const otherStore = useOtherStore();
+const uiStore = useUiStore();
 
-const { authorised, globalLogin, overlay, basketsData, bookmarkedData } = storeToRefs(otherStore);
+const { authorised, globalLogin, basketsData, bookmarkedData } = storeToRefs(otherStore);
 const { updateDisplayedItems } = otherStore;
+
+const { overlay } = storeToRefs(uiStore);
 
 const showPassword = ref(false);
 const loading = ref(false);
