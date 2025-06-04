@@ -1,5 +1,5 @@
 import { ref, computed, onMounted } from 'vue';
-import { defineStore } from 'pinia';
+import { defineStore, storeToRefs } from 'pinia';
 import axios from 'axios';
 import { resolve } from 'chart.js/helpers';
 import { API_ENDPOINTS } from '@/config';
@@ -7,11 +7,10 @@ import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
 
 import { useUiStore } from '@/stores/uiStore.js';
 
-const uiStore = useUiStore();
-
-const { overlay } = storeToRefs(uiStore);
 
 export const useOtherStore = defineStore('other', () => {
+  const uiStore = useUiStore();
+  const { overlay } = storeToRefs(uiStore);
 
   const sliderData = ref([]);
   const productsData = ref([]);
