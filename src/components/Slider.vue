@@ -64,7 +64,7 @@ onMounted(() => {
     >
       <swiper-slide v-for="slide in props.data" :key="slide.id">
         <img
-          :src="slide.url"
+          :src="slide.img"
           :alt="slide.alt"
           height="100%"
         >
