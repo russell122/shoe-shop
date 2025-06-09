@@ -74,25 +74,40 @@ onMounted(async () => {
   }
 
   console.log(888);
-  await otherStore.getSliderData();
-  await otherStore.getProductsData();
-  if (authorised.value) {
-    await otherStore.getBasketsData();
-    await otherStore.getBookmarkedData();
-    console.log(666);
-  }
-  console.log(999);
 
-  updateDisplayedItems();
+  overlay.value = true;
 
-  if (dataRetrievalError.value) {
-    transitionDataRetrievalError.value = true;
-    setLocalStorage('transitionDataRetrievalError', transitionDataRetrievalError.value);
-    await router.replace({ name: 'dataRetrievalError' });
-  } else {
-    transitionDataRetrievalError.value = false;
-    setLocalStorage('transitionDataRetrievalError', transitionDataRetrievalError.value);
+  try {
+    await Promise.all([
+      otherStore.getSliderData(),
+      otherStore.getProductsData()
+    ]);
+
+    if(authorised.value) {
+      await Promise.all([
+        otherStore.getBasketsData(),
+        otherStore.getBookmarkedData()
+      ]);
+      console.log(666);
+    }
+    console.log(999);
+
+    updateDisplayedItems();
+
+    if (dataRetrievalError.value) {
+      transitionDataRetrievalError.value = true;
+      setLocalStorage('transitionDataRetrievalError', transitionDataRetrievalError.value);
+      await router.replace({ name: 'dataRetrievalError' });
+    } else {
+      transitionDataRetrievalError.value = false;
+      setLocalStorage('transitionDataRetrievalError', transitionDataRetrievalError.value);
+    }
+  } catch(error) {
+    console.error('Ошибка при загрузке данных:', error);
+  } finally {
+    overlay.value = false;
   }
+
 });
 
 window.addEventListener('storage', async (event) => {
