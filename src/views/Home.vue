@@ -19,7 +19,7 @@ const router = useRouter();
 <template>
   <div class="home">
     <div class="container">
-      <Slider :data="sliderData" />
+      <Slider :data="sliderData" :contentLoaded="contentLoaded" />
       <AllShoes />
       <!--      <TestSlider />-->
     </div>

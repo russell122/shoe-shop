@@ -4,6 +4,7 @@ import axios from 'axios';
 import { resolve } from 'chart.js/helpers';
 import { API_ENDPOINTS } from '@/config';
 import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
+import { preloadImages } from '@/composables/usePreloadImages.js';
 
 import { useUiStore } from '@/stores/uiStore.js';
 
@@ -21,6 +22,7 @@ export const useOtherStore = defineStore('other', () => {
   const user_id = ref();
   const dataRetrievalError = ref(false);
   const transitionDataRetrievalError = ref(false);
+  const contentLoaded = ref(false);
   const headerMenuItems = ref([
     {
       title: 'Вход',
@@ -64,17 +66,45 @@ export const useOtherStore = defineStore('other', () => {
   const getSliderData = async () => {
     return new Promise((resolve) => { // из-за setTimeout, без промиса код ждать не будет
       setTimeout(async () => { // что бы было видно прелоадер
+        contentLoaded.value = false;
+        dataRetrievalError.value = false;
+
         try {
           console.log('Запрос на данные слайдера начался');
           const { data } = await axios.get(API_ENDPOINTS.slider);
-          sliderData.value = data;
-          dataRetrievalError.value = false;
-          console.log('Запрос на данные слайдера завершен');
+
+          // Проверка и нормализация данных
+          if (!data || !Array.isArray(data)) {
+            throw new Error('Некорректные данные слайдера');
+          }
+
+          // Добавляем флаг loaded для изображений
+          const normalizedData = data.map(item => ({
+            ...item,
+            loaded: false
+          }));
+
+          sliderData.value = normalizedData;
+
+          // Прелоад изображений
+          const imageUrls = normalizedData
+            .map(item => item.img || item.url) // учитываем разные варианты названия поля
+            .filter(Boolean);
+
+          if (imageUrls.length > 0) {
+            await preloadImages(imageUrls);
+          }
+
+          // Имитация задержки для демонстрации скелетона
+          // await new Promise(r => setTimeout(r, 500));
+
+          contentLoaded.value = true;
+          console.log('Данные успешно загружены');
         } catch (error) {
+          console.error('Ошибка загрузки:', error);
           dataRetrievalError.value = true;
-          console.log(error);
         } finally {
-          resolve(); // Уведомляем, что выполнение завершено
+          resolve();
         }
       }, 100);
     });
@@ -132,7 +162,7 @@ export const useOtherStore = defineStore('other', () => {
             basketsData.value = data;
           }
 
-          setLocalStorage('baskets', basketsData.value )
+          setLocalStorage('baskets', basketsData.value);
 
           console.log('ДЕБАГЕР');
           console.log(basketsData);
@@ -210,6 +240,7 @@ export const useOtherStore = defineStore('other', () => {
     globalLogin,
     user_id,
     displayedItems,
+    contentLoaded,
     getSliderData,
     getProductsData,
     getBasketsData,
