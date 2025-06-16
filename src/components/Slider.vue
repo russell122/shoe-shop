@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { computed } from 'vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -7,40 +7,27 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 const modules = [Navigation, Pagination];
-const showSkeleton = ref(true);
-const showContent = ref(false);
+
+import { useImageSkeletonLoader } from '@/composables/useImageSkeletonLoader.js';
 
 const props = defineProps({
   data: Array,
   contentLoaded: Boolean
 });
 
+/* (item) => item.img это просто колбэк-иструкция, в useImageSkeletonLoader в map он извлечет item.img*/
 
-watch(() => props.contentLoaded, (loaded) => {
-  if (loaded) {
-    showSkeleton.value = false;
-    showContent.value = true;
-  } else {
-    showContent.value = false;
-    showSkeleton.value = true;
-  }
-}, {
-  immediate: true
-});
-
-// Инициализация
-onMounted(() => {
-  if (!props.contentLoaded) {
-    showSkeleton.value = true;
-  }
-});
+const { skeletonVisible, contentVisible } = useImageSkeletonLoader(
+  computed(() => props.data || []),
+  (item) => item.img
+);
 </script>
 
 <template>
   <div class="swiper__wrap">
 
     <swiper
-      v-if="showSkeleton"
+      v-if="skeletonVisible"
       :modules="modules"
       :navigation="true"
       :pagination="{ clickable: true }"
@@ -56,7 +43,7 @@ onMounted(() => {
     </swiper>
 
     <swiper
-      v-if="showContent"
+      v-if="contentVisible"
       :modules="modules"
       :navigation="true"
       :pagination="{ clickable: true }"
