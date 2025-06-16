@@ -9,6 +9,7 @@ import TestChartJs from '@/testСomponents/components/TestChartJs.vue';
 import StepByStepGuideChartJs_Bar from '@/testСomponents/components/StepByStepGuideChartJs_Bar.vue';
 import RealWorldDataChartJs from '@/testСomponents/components/RealWorldDataChartJs.vue';
 import TestChartJsForMPGU from '@/testСomponents/components/TestChartJsForMPGU.vue';
+// import TestChartJsForMPGU2 from '@/testСomponents/components/TestChartJsForMPGU2.vue';
 </script>
 
 <template>
@@ -19,7 +20,8 @@ import TestChartJsForMPGU from '@/testСomponents/components/TestChartJsForMPGU.
   <!--	<StepByStepGuideChartJs_Bar/>-->
   <!--	<RealWorldDataChartJs/>-->
 
-  <!--	<TestChartJsForMPGU/>-->
+  <!--  <TestChartJsForMPGU />-->
+  <!--  <TestChartJsForMPGU2 />-->
 
   <RouterView />
 
