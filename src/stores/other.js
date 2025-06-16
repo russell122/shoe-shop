@@ -22,7 +22,6 @@ export const useOtherStore = defineStore('other', () => {
   const user_id = ref();
   const dataRetrievalError = ref(false);
   const transitionDataRetrievalError = ref(false);
-  const contentLoaded = ref(false);
   const headerMenuItems = ref([
     {
       title: 'Вход',
@@ -66,7 +65,6 @@ export const useOtherStore = defineStore('other', () => {
   const getSliderData = async () => {
     return new Promise((resolve) => { // из-за setTimeout, без промиса код ждать не будет
       setTimeout(async () => { // что бы было видно прелоадер
-        contentLoaded.value = false;
         dataRetrievalError.value = false;
 
         try {
@@ -86,7 +84,6 @@ export const useOtherStore = defineStore('other', () => {
           // Имитация задержки для демонстрации скелетона
           // await new Promise(r => setTimeout(r, 500));
 
-          contentLoaded.value = true;
           console.log('Данные успешно загружены');
         } catch (error) {
           console.error('Ошибка загрузки:', error);
@@ -228,7 +225,6 @@ export const useOtherStore = defineStore('other', () => {
     globalLogin,
     user_id,
     displayedItems,
-    contentLoaded,
     getSliderData,
     getProductsData,
     getBasketsData,

@@ -11,8 +11,7 @@ const modules = [Navigation, Pagination];
 import { useImageSkeletonLoader } from '@/composables/useImageSkeletonLoader.js';
 
 const props = defineProps({
-  data: Array,
-  contentLoaded: Boolean
+  data: Array
 });
 
 /* (item) => item.img это просто колбэк-иструкция, в useImageSkeletonLoader в map он извлечет item.img*/

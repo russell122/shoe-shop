@@ -10,7 +10,7 @@ import { useRouter } from 'vue-router';
 
 const otherStore = useOtherStore();
 
-const { sliderData, contentLoaded } = storeToRefs(otherStore);
+const { sliderData } = storeToRefs(otherStore);
 
 const router = useRouter();
 
@@ -19,7 +19,7 @@ const router = useRouter();
 <template>
   <div class="home">
     <div class="container">
-      <Slider :data="sliderData" :contentLoaded="contentLoaded" />
+      <Slider :data="sliderData" />
       <AllShoes />
       <!--      <TestSlider />-->
     </div>
