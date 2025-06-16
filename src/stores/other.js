@@ -73,22 +73,10 @@ export const useOtherStore = defineStore('other', () => {
           console.log('Запрос на данные слайдера начался');
           const { data } = await axios.get(API_ENDPOINTS.slider);
 
-          // Проверка и нормализация данных
-          if (!data || !Array.isArray(data)) {
-            throw new Error('Некорректные данные слайдера');
-          }
+          sliderData.value = data;
 
-          // Добавляем флаг loaded для изображений
-          const normalizedData = data.map(item => ({
-            ...item,
-            loaded: false
-          }));
-
-          sliderData.value = normalizedData;
-
-          // Прелоад изображений
-          const imageUrls = normalizedData
-            .map(item => item.img || item.url) // учитываем разные варианты названия поля
+          const imageUrls = sliderData.value
+            .map(item => item.img)
             .filter(Boolean);
 
           if (imageUrls.length > 0) {
