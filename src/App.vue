@@ -21,8 +21,10 @@ const {
   authorised,
   dataRetrievalError,
   transitionDataRetrievalError,
+  productsData,
   basketsData,
   bookmarkedData,
+  sliderData,
   displayedItems
 } = storeToRefs(otherStore);
 const { updateDisplayedItems } = otherStore;
@@ -40,6 +42,12 @@ import { useDisplay } from 'vuetify';
 const { width } = useDisplay();
 
 const isMobile = ref();
+
+/* Общий наблюдатель за всеми данными необходимыми для приложения, если все загружены офнем оверлей */
+const allDataReady = computed(() => {
+  return productsData.value && productsData.value.length > 0 &&
+    sliderData.value && sliderData.value.length > 0;
+});
 
 watch(width, (newValue) => {
   isMobile.value = newValue;
@@ -63,6 +71,14 @@ watch(width, (newValue) => {
   immediate: true
 });
 
+watch(allDataReady, (ready) => {
+  if (ready) {
+    setTimeout(() => {
+      overlay.value = false;
+    }, 300);
+  }
+}, { immediate: true });
+
 /**
  * Проверяем при заходе на сайт авторизован ли уже пользователь, если да то запускается логика authorised
  */
@@ -83,7 +99,7 @@ onMounted(async () => {
       otherStore.getProductsData()
     ]);
 
-    if(authorised.value) {
+    if (authorised.value) {
       await Promise.all([
         otherStore.getBasketsData(),
         otherStore.getBookmarkedData()
@@ -102,7 +118,7 @@ onMounted(async () => {
       transitionDataRetrievalError.value = false;
       setLocalStorage('transitionDataRetrievalError', transitionDataRetrievalError.value);
     }
-  } catch(error) {
+  } catch (error) {
     console.error('Ошибка при загрузке данных:', error);
   } finally {
     overlay.value = false;

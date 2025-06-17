@@ -4,7 +4,6 @@ import axios from 'axios';
 import { resolve } from 'chart.js/helpers';
 import { API_ENDPOINTS } from '@/config';
 import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
-import { preloadImages } from '@/composables/usePreloadImages.js';
 
 import { useUiStore } from '@/stores/uiStore.js';
 
@@ -65,24 +64,15 @@ export const useOtherStore = defineStore('other', () => {
   const getSliderData = async () => {
     return new Promise((resolve) => { // из-за setTimeout, без промиса код ждать не будет
       setTimeout(async () => { // что бы было видно прелоадер
-        dataRetrievalError.value = false;
-
         try {
           console.log('Запрос на данные слайдера начался');
           const { data } = await axios.get(API_ENDPOINTS.slider);
 
           sliderData.value = data;
+          dataRetrievalError.value = false;
 
-          const imageUrls = sliderData.value
-            .map(item => item.img)
-            .filter(Boolean);
-
-          if (imageUrls.length > 0) {
-            await preloadImages(imageUrls);
-          }
-
-          // Имитация задержки для демонстрации скелетона
-          // await new Promise(r => setTimeout(r, 500));
+          // Небольшая задержка для демонстрации скелетона
+          await new Promise(r => setTimeout(r, 1000));
 
           console.log('Данные успешно загружены');
         } catch (error) {
@@ -103,12 +93,12 @@ export const useOtherStore = defineStore('other', () => {
           const { data } = await axios.get(API_ENDPOINTS.products);
           productsData.value = data;
           dataRetrievalError.value = false;
+
           console.log('Запрос на данные продуктов завершен');
         } catch (error) {
           dataRetrievalError.value = true;
           console.log(error);
         } finally {
-          overlay.value = false;
           resolve();  // Уведомляем, что выполнение завершено
         }
       }, 100);
@@ -157,7 +147,6 @@ export const useOtherStore = defineStore('other', () => {
           dataRetrievalError.value = true;
           console.log(error);
         } finally {
-          overlay.value = false;
           resolve();
         }
       }, 100);
@@ -207,7 +196,6 @@ export const useOtherStore = defineStore('other', () => {
           console.log('Я че в кетч');
           console.log(9090);
         } finally {
-          overlay.value = false;
           resolve();
         }
       });
