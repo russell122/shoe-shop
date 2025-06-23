@@ -1,14 +1,12 @@
 <script setup>
 
 import { RouterLink, useRouter } from 'vue-router';
-
 import { storeToRefs } from 'pinia';
-
 import { useOtherStore } from '@/stores/other.js';
-import { useUiStore } from '@/stores/uiStore.js';
+import { useMobileNavigation } from '@/composables/useMobileNavigation';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 
 const otherStore = useOtherStore();
-const uiStore = useUiStore();
 
 const {
   authorised,
@@ -18,21 +16,17 @@ const {
   bookmarkedData
 } = storeToRefs(otherStore);
 
-const { drawer, basketOverlay } = storeToRefs(uiStore);
-
-const { updateDisplayedItems } = otherStore;
+const {
+  isMobile,
+  drawer,
+  basketOverlay,
+  onMenuToggle,
+  handleEscapeKey
+} = useMobileNavigation();
 
 const router = useRouter();
-
-import { useDisplay } from 'vuetify';
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
-
-const { width } = useDisplay();
-
-const isMobile = computed(() => width.value <= 576);
 const basketButton = ref(null);
 const drawerButton = ref(null);
-
 
 /**
  * Выход из аккаунта, удаление данных из localStorage, запуск логики authorised
@@ -51,47 +45,13 @@ const logout = async (e) => {
   await router.push('/');
 };
 
-/**
- * Открытие/закрытие меню
- */
-const onMenuToggle = (isVisible) => {
-  console.log(111);
-  console.log(displayedItems);
-  // console.log(displayedItems.value)
-  if (!isVisible) {
-    setTimeout(updateDisplayedItems, 300); // Задержка столько же сколько и время анимации(open-delay)
-  }
-};
-
 onMounted(async () => {
-  window.addEventListener('keyup', handleKeyUp);
+  window.addEventListener('keyup', handleEscapeKey);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keyup', handleKeyUp);
+  window.removeEventListener('keyup', handleEscapeKey);
 });
-
-const handleKeyUp = (event) => {
-  if (event.key === 'Escape') {
-    if (basketOverlay.value) {
-      basketOverlay.value = false;
-      // Сбрасываем фокус с кнопки
-      nextTick(() => {
-        basketButton.value?.$el?.blur();
-      });
-    }
-
-    if (drawer.value) {
-      drawer.value = false;
-      // Сбрасываем фокус с кнопки
-      nextTick(() => {
-        drawerButton.value?.$el?.blur();
-      });
-    }
-
-  }
-};
-
 
 </script>
 
@@ -162,13 +122,9 @@ const handleKeyUp = (event) => {
         </v-menu>
       </template>
 
-      <!-- Остальные элементы шапки без изменений -->
-
-
     </div>
 
   </v-app-bar>
-
 
 </template>
 

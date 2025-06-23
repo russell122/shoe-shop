@@ -2,13 +2,15 @@
 
 import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
+import MobileNavigation from '@/components/MobileNavigation.vue';
 
-import { RouterLink, RouterView } from 'vue-router';
+import { RouterView } from 'vue-router';
 
 import { useOtherStore } from '@/stores/other.js';
 import { useUiStore } from '@/stores/uiStore.js';
+import { useMobileNavigation } from '@/composables/useMobileNavigation';
 
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
@@ -24,12 +26,12 @@ const {
   productsData,
   basketsData,
   bookmarkedData,
-  sliderData,
-  displayedItems
+  sliderData
 } = storeToRefs(otherStore);
 const { updateDisplayedItems } = otherStore;
 
-const { drawer, overlay, basketOverlay } = storeToRefs(uiStore);
+const { overlay } = storeToRefs(uiStore);
+const { isMobile, basketOverlay } = useMobileNavigation();
 
 import { useRouter } from 'vue-router';
 import Loader from '@/components/Loader.vue';
@@ -41,8 +43,6 @@ import { useDisplay } from 'vuetify';
 
 const { width } = useDisplay();
 
-const isMobile = ref();
-
 /* Общий наблюдатель за всеми данными необходимыми для приложения, если все загружены офнем оверлей */
 const allDataReady = computed(() => {
   return productsData.value && productsData.value.length > 0 &&
@@ -51,22 +51,6 @@ const allDataReady = computed(() => {
 
 watch(width, (newValue) => {
   isMobile.value = newValue;
-
-  // if (newValue <= 576) {
-  //   isMobile.value = true;
-  //   if (basketOverlay.value) {
-  //     drawer.value = true;
-  //   }
-  //   basketOverlay.value = false;
-  //
-  //
-  // } else {
-  //   isMobile.value = false;
-  //   if (drawer.value) {
-  //     basketOverlay.value = true;
-  //   }
-  //   drawer.value = false;
-  // }
 }, {
   immediate: true
 });
@@ -133,37 +117,20 @@ window.addEventListener('storage', async (event) => {
   }
 });
 
-const items = ref([
-  {
-    title: 'Foo',
-    value: 'foo'
-  },
-  {
-    title: 'Bar',
-    value: 'bar'
-  },
-  {
-    title: 'Fizz',
-    value: 'fizz'
-  },
-  {
-    title: 'Buzz',
-    value: 'buzz'
-  }
-]);
-
-const openBasket = () => {
-  basketOverlay.value = true;
-  drawer.value = !drawer.value;
-};
-
 /**
- * Открытие/закрытие меню
+ * Выход из аккаунта
  */
-const onMenuToggle = (isVisible) => {
-  if (!isVisible) {
-    setTimeout(updateDisplayedItems, 300); // Задержка столько же сколько и время анимации(open-delay)
-  }
+const logout = async () => {
+  authorised.value = null;
+  globalLogin.value = '';
+
+  localStorage.clear();
+  basketsData.value = [];
+  bookmarkedData.value = [];
+
+  basketOverlay.value = false;
+
+  await router.push('/');
 };
 
 </script>
@@ -178,56 +145,8 @@ const onMenuToggle = (isVisible) => {
 
         <Header />
 
-        <template v-if="isMobile">
-          <v-navigation-drawer
-            v-model="drawer"
-            temporary
-            location="right"
-          >
-            <!--            <v-list-item>-->
-            <!--            </v-list-item>-->
-
-            <!--            <v-list-->
-            <!--              :items="items"-->
-            <!--            ></v-list>-->
-
-            <v-btn min-width="40" min-height="40" @click="openBasket" ref="basketButton">
-              <v-icon size="22">mdi-basket-outline</v-icon>
-            </v-btn>
-
-            <router-link to="/about" class="text-decoration-none">
-              <v-btn min-width="40" min-height="40">
-                <v-icon size="22">mdi-heart-outline</v-icon>
-              </v-btn>
-            </router-link>
-
-            <v-menu @update:modelValue="onMenuToggle" :open-delay="300">
-              <template v-slot:activator="{ props }">
-                <v-btn class="c-btn-icon" min-width="40" min-height="40" v-bind="props">
-                  <template v-slot:prepend>
-                    <p>{{ globalLogin }}</p>
-                  </template>
-                  <v-icon size="22">mdi-dots-vertical</v-icon>
-                </v-btn>
-              </template>
-
-              <v-list class="header-list">
-                <v-list-item
-                  v-for="(item, i) in displayedItems"
-                  :key="i"
-                >
-                  <router-link :to="item.route" @click="item.type === 'exit' ? logout() : '' "
-                               class="header__logo-link text-decoration-none">
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
-                  </router-link>
-
-                </v-list-item>
-              </v-list>
-            </v-menu>
-
-
-          </v-navigation-drawer>
-        </template>
+        <!-- Мобильное меню -->
+        <MobileNavigation v-if="isMobile" @logout="logout" />
 
         <Basket v-if="basketOverlay" />
 
