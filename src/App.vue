@@ -9,8 +9,9 @@ import { RouterView } from 'vue-router';
 import { useOtherStore } from '@/stores/other.js';
 import { useUiStore } from '@/stores/uiStore.js';
 import { useMobileNavigation } from '@/composables/useMobileNavigation';
+import { useDataSync } from '@/composables/useDataSync.js';
 
-import { computed, onMounted, watch } from 'vue';
+import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { getLocalStorage, setLocalStorage } from '@/utils/localStorage';
@@ -23,15 +24,14 @@ const {
   authorised,
   dataRetrievalError,
   transitionDataRetrievalError,
-  productsData,
   basketsData,
-  bookmarkedData,
-  sliderData
+  bookmarkedData
 } = storeToRefs(otherStore);
 const { updateDisplayedItems } = otherStore;
 
 const { overlay } = storeToRefs(uiStore);
 const { isMobile, basketOverlay } = useMobileNavigation();
+const { isMobile, overlay, basketsData, bookmarkedData } = useDataSync;
 
 import { useRouter } from 'vue-router';
 import Loader from '@/components/Loader.vue';
@@ -39,29 +39,6 @@ import Basket from '@/components/Basket.vue';
 
 const router = useRouter();
 
-import { useDisplay } from 'vuetify';
-
-const { width } = useDisplay();
-
-/* Общий наблюдатель за всеми данными необходимыми для приложения, если все загружены офнем оверлей */
-const allDataReady = computed(() => {
-  return productsData.value && productsData.value.length > 0 &&
-    sliderData.value && sliderData.value.length > 0;
-});
-
-watch(width, (newValue) => {
-  isMobile.value = newValue;
-}, {
-  immediate: true
-});
-
-watch(allDataReady, (ready) => {
-  if (ready) {
-    setTimeout(() => {
-      overlay.value = false;
-    }, 300);
-  }
-}, { immediate: true });
 
 /**
  * Проверяем при заходе на сайт авторизован ли уже пользователь, если да то запускается логика authorised
@@ -110,13 +87,6 @@ onMounted(async () => {
 
 });
 
-window.addEventListener('storage', async (event) => {
-  if (event.key === 'baskets' || event.key === 'bookmarked') {
-    basketsData.value = getLocalStorage('baskets', []);
-    bookmarkedData.value = getLocalStorage('bookmarked', []);
-  }
-});
-
 /**
  * Выход из аккаунта
  */
@@ -161,67 +131,3 @@ const logout = async () => {
 
   </v-app>
 </template>
-
-<style lang="scss">
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-.layout {
-  flex-direction: column;
-}
-
-.container {
-  margin: 0 auto;
-  padding: 0 15px;
-  max-width: 1560px;
-  width: 100%;
-  @media screen and (max-width: 1199px) {
-    max-width: 970px;
-  }
-  @media screen and (max-width: 992px) {
-    max-width: 750px;
-  }
-  @media screen and (max-width: 768px) {
-    max-width: none;
-  }
-}
-
-.img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
-.login {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 600px;
-  margin: 0 auto;
-  padding: 45px 0;
-}
-
-.login input, button {
-  margin: 15px 0;
-}
-
-.login input, .p-password {
-  width: 100%;
-}
-
-.login button, .p-float-label {
-  width: 50%;
-}
-
-.p-float-label label {
-  transform: translate(0, -50%);
-}
-
-.p-float-label:has(input:focus) label, .p-float-label:has(input.p-filled) label, .p-float-label:has(input:-webkit-autofill) label, .p-float-label:has(textarea:focus) label, .p-float-label:has(textarea.p-filled) label, .p-float-label:has(.p-inputwrapper-focus) label, .p-float-label:has(.p-inputwrapper-filled) label {
-  top: -0.01rem;
-  font-size: 12px;
-}
-</style>
