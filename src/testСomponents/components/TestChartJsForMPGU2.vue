@@ -1,9 +1,9 @@
 <template>
-  <div class="container">
-    <div class="chart-container">
-      <canvas ref="chartCanvas"></canvas>
-    </div>
+  <!--  <div class="container">-->
+  <div class="chart-container">
+    <canvas ref="chartCanvas"></canvas>
   </div>
+  <!--  </div>-->
 </template>
 
 <script setup>
@@ -15,12 +15,19 @@ Chart.register(...registerables);
 const data = ref({
   'year': 2023,
   'name_list': [
-    { 'name': 'МИХАИЛ', 'id_name': 123, 'rank': 1, 'cnt': 15331, 'gender': 'M', 'color': '#3CC755' },
+    {
+      'name': 'МИХАИЛ',
+      'id_name': 123,
+      'rank': 1,
+      'cnt': 15331,
+      'gender': 'M',
+      'color': '#3CC755'
+    },
     { 'name': 'АННА', 'id_name': 124, 'rank': 1, 'cnt': 14250, 'gender': 'F', 'color': '#FF6384' },
-    { 'name': 'АЛЕКСАНДР', 'id_name': 125, 'rank': 2, 'cnt': 13200, 'gender': 'M', 'color': '#36A2EB' },
-    { 'name': 'СОФИЯ', 'id_name': 126, 'rank': 2, 'cnt': 12800, 'gender': 'F', 'color': '#242012' },
-    { 'name': 'ЛЕВ', 'id_name': 127, 'rank': 3, 'cnt': 11500, 'gender': 'M', 'color': '#9966FF' },
-    { 'name': 'МАРИЯ', 'id_name': 128, 'rank': 3, 'cnt': 11000, 'gender': 'F', 'color': '#4BC0C0' }
+    { 'name': 'АЛЕКСАНДР', 'id_name': 125, 'rank': 2, 'cnt': 17200, 'gender': 'M', 'color': '#36A2EB' },
+    { 'name': 'СОФИЯ', 'id_name': 126, 'rank': 2, 'cnt': 5800, 'gender': 'F', 'color': '#242012' },
+    { 'name': 'ЛЕВ', 'id_name': 127, 'rank': 3, 'cnt': 1100, 'gender': 'M', 'color': '#9966FF' },
+    { 'name': 'МАРИЯ', 'id_name': 128, 'rank': 3, 'cnt': 1000, 'gender': 'F', 'color': '#4BC0C0' }
   ]
 });
 
@@ -50,10 +57,10 @@ const chartOptions = {
   maintainAspectRatio: false,
   layout: {
     padding: {
-      left: 10,
-      right: 10,
-      top: 10,
-      bottom: 10
+      left: 20,
+      right: 20,
+      top: 20,
+      bottom: 20
     }
   },
   plugins: {
@@ -77,7 +84,7 @@ const chartOptions = {
       },
       max: function(context) {
         const maxValue = Math.max(...context.chart.data.datasets[0].data);
-        return maxValue * 1.1;
+        return maxValue * 1.3;
       }
     },
     y: {
@@ -147,7 +154,6 @@ watch(chartData, initChart);
   margin: 50px 0;
   position: relative;
   height: 500px;
-  min-width: 600px;
   background: #fff;
   border-radius: 8px;
   overflow: visible;
