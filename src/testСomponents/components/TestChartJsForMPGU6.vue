@@ -23,13 +23,13 @@ const data = {
       rank: 1,
       cnt: 15331,
       gender: 'M',
-      color: '#3CC755'
+      color: '#1C7BFF'
     },
-    { name: 'АННА', id_name: 124, rank: 1, cnt: 14250, gender: 'F', color: '#FF6384' },
-    { name: 'АЛЕКСАНДР', id_name: 125, rank: 2, cnt: 17200, gender: 'M', color: '#36A2EB' },
-    { name: 'СОФИЯ', id_name: 126, rank: 2, cnt: 5800, gender: 'F', color: '#242012' },
-    { name: 'ЛЕВ', id_name: 127, rank: 3, cnt: 1100, gender: 'M', color: '#9966FF' },
-    { name: 'МАРИЯ', id_name: 128, rank: 3, cnt: 1000, gender: 'F', color: '#4BC0C0' }
+    { name: 'АННА', id_name: 124, rank: 1, cnt: 14250, gender: 'F', color: '#4093FF' },
+    { name: 'АЛЕКСАНДР', id_name: 125, rank: 2, cnt: 17200, gender: 'M', color: '#6EADFF' },
+    { name: 'СОФИЯ', id_name: 126, rank: 2, cnt: 5800, gender: 'F', color: '#99C7FF' },
+    { name: 'ЛЕВ', id_name: 127, rank: 3, cnt: 1100, gender: 'M', color: '#C4DFFF' },
+    { name: 'МАРИЯ', id_name: 128, rank: 3, cnt: 1000, gender: 'F', color: '#F0F7FF' }
   ]
 };
 
@@ -45,7 +45,7 @@ onMounted(() => {
           backgroundColor: data.name_list.map(item => item.color),
           borderColor: '#fff',
           borderWidth: 1,
-          borderRadius: 4
+          borderRadius: { topRight: 20, bottomRight: 20, topLeft: 20, bottomLeft: 20 }
         }]
       },
       options: {
