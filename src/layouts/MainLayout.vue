@@ -12,6 +12,10 @@ import TestChartJsForMPGU from '@/testСomponents/components/TestChartJsForMPGU.
 import TestChartJsForMPGU2 from '@/testСomponents/components/TestChartJsForMPGU2.vue';
 import TestChartJsForMPGU3 from '@/testСomponents/components/TestChartJsForMPGU3.vue';
 import TestChartJsForMPGU4 from '@/testСomponents/components/TestChartJsForMPGU4.vue';
+import TestChartJsForMPGU5 from '@/testСomponents/components/TestChartJsForMPGU5.vue';
+import TestChartJsForMpgu6Ok from '@/testСomponents/components/TestChartJsForMPGU6OK.vue';
+import TestChartJsForMpgu7Ok from '@/testСomponents/components/TestChartJsForMPGU7OK.vue';
+import WrapTestChartJsForMPGU2 from '@/testСomponents/components/WrapTestChartJsForMPGU2.vue';
 
 const data = ref({
   'year': 2023,
@@ -44,7 +48,7 @@ const data = ref({
   <!--  <Header />-->
   <!--  <Header2 />-->
 
-  <!--	<TestChartJs/>-->
+  <!--  <TestChartJs />-->
   <!--	<StepByStepGuideChartJs_Bar/>-->
   <!--	<RealWorldDataChartJs/>-->
 
@@ -86,19 +90,59 @@ const data = ref({
   <!--    </div>-->
   <!--  </div>-->
 
-  <div class="container">
-    <div class="test__wrap">
-      <div class="test__left">
-        <TestChartJsForMPGU4
-          :data="data" />
-      </div>
-      <div class="test__right">
-        <TestChartJsForMPGU4
-          :data="data" />
+  <!--  <div class="container">-->
+  <!--    <div class="test__wrap">-->
+  <!--      <div class="test__left">-->
+  <!--        <TestChartJsForMPGU4-->
+  <!--          :data="data" />-->
+  <!--      </div>-->
+  <!--      <div class="test__right">-->
+  <!--        <TestChartJsForMPGU4-->
+  <!--          :data="data" />-->
 
-      </div>
-    </div>
-  </div>
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--  </div>-->
+
+  <WrapTestChartJsForMPGU2 />
+
+
+  <!--  <div class="container">-->
+  <!--    <div class="test__wrap">-->
+  <!--      <div class="test__left">-->
+  <!--        <TestChartJsForMPGU5 />-->
+  <!--      </div>-->
+  <!--      <div class="test__right">-->
+  <!--        <TestChartJsForMPGU5 />-->
+
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--  </div>-->
+
+  <!--  <div class="container">-->
+  <!--    <TestChartJsForMpgu6Ok />-->
+  <!--    <div class="test__wrap">-->
+  <!--      <div class="test__left">-->
+  <!--        <TestChartJsForMpgu6Ok />-->
+  <!--      </div>-->
+  <!--      <div class="test__right">-->
+  <!--        <TestChartJsForMpgu6Ok />-->
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--  </div>-->
+
+
+  <!--  <div class="container">-->
+  <!--    <div class="test__wrap">-->
+  <!--      <div class="test__left">-->
+  <!--        <TestChartJsForMpgu7Ok />-->
+  <!--      </div>-->
+  <!--      <div class="test__right">-->
+  <!--        <TestChartJsForMpgu7Ok />-->
+
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--  </div>-->
 
   <!--  <div class="container">-->
   <!--    <TestChartJsForMPGU4-->
@@ -114,13 +158,22 @@ const data = ref({
 .test__wrap {
   display: flex;
   justify-content: space-between;
+  @media screen and (max-width: 1199px) {
+    flex-direction: column;
+  }
 }
 
 .test__left {
   flex: 0 1 48%;
+  @media screen and (max-width: 1199px) {
+    flex: 0 1 100%;
+  }
 }
 
 .test__right {
   flex: 0 1 48%;
+  @media screen and (max-width: 1199px) {
+    flex: 0 1 100%;
+  }
 }
 </style>
