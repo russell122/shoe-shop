@@ -13,13 +13,6 @@ Chart.register(...registerables);
 const chartCanvas = ref(null);
 let chartInstance = null;
 
-// Генерируем данные
-// const years = Array.from({ length: 2025 - 1999 + 1 }, (_, i) => 1999 + i);
-// const dataPoints = years.map(() => Math.floor(Math.random() * 11)); // случайные значения от 0 до 10
-
-// const years = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
-// const dataPoints = [6, 7, 10, 1, 5, 6, 7, 8, 9, 10, 5, 9, 2, 6, 8, 2];
-
 const years = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
 const dataPoints = [6, 7, 9, 2, 6, 8, 2];
 
@@ -33,39 +26,60 @@ onMounted(() => {
           label: 'Популярность',
           data: dataPoints,
           borderColor: '#CC0029',
-          backgroundColor: 'rgba(28,123,255,0.1)',
+          backgroundColor: 'rgba(0, 123, 255, 0.3)',
           pointBackgroundColor: '#CC0029',
           pointRadius: 4,
           tension: 0,
-          borderJoinStyle: 'miter'
+          borderJoinStyle: 'miter',
+          fill: {
+            target: 'start',
+            above: 'rgba(0, 123, 255, 0.3)'
+          }
         }]
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
           tooltip: { enabled: true }
         },
         scales: {
           x: {
-            title: { display: false, text: 'Год' },
+            title: { display: false },
             ticks: {
-              autoSkip: false, // Все метки будут показаны
-              maxRotation: 0, // Без поворота
-              minRotation: 0
+              autoSkip: false,
+              maxRotation: 0,
+              minRotation: 0,
+              padding: 20 // Убираем отступы у меток
             },
-            offset: true
+            offset: false,
+            grid: {
+              drawTicks: false,
+              drawBorder: false
+            },
+            afterFit: function(scale) {
+              scale.paddingLeft = 0;
+              scale.paddingRight = 0;
+            }
           },
           y: {
-            title: { display: false, text: 'Место (полярность)' },
+            title: { display: false },
             min: 1,
             max: 10,
-            reverse: true, // <-- инвертируем ось: 0 сверху, 10 снизу
+            reverse: true,
             ticks: {
-              stepSize: 1
+              stepSize: 1,
+              padding: 20 // Убираем отступы у меток
             },
-            offset: true
+            offset: false,
+            grid: {
+              drawBorder: false
+            }
           }
+        },
+        layout: {
+          padding: 0
         }
       }
     });
@@ -86,5 +100,13 @@ onBeforeUnmount(() => {
   margin: 40px 0;
   background: #fff;
   border-radius: 8px;
+  padding: 5px; /* Минимальный отступ для контейнера */
+}
+
+.chart-container canvas {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  margin: 0;
 }
 </style>
