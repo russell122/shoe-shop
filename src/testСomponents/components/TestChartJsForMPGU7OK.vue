@@ -21,7 +21,7 @@ let chartInstance = null;
 // const dataPoints = [6, 7, 10, 1, 5, 6, 7, 8, 9, 10, 5, 9, 2, 6, 8, 2];
 
 const years = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
-const dataPoints = [6, 7, 9, 2, 6, 8, 2];
+const dataPoints = [6, 7, 9, 2, 10, 8, 1];
 
 onMounted(() => {
   if (chartCanvas.value) {
@@ -37,7 +37,8 @@ onMounted(() => {
           pointBackgroundColor: '#CC0029',
           pointRadius: 4,
           tension: 0,
-          borderJoinStyle: 'miter'
+          borderJoinStyle: 'miter',
+          clip: {left: 20, right: 20, top: false, bottom: false}
         }]
       },
       options: {
@@ -52,9 +53,20 @@ onMounted(() => {
             ticks: {
               autoSkip: false, // Все метки будут показаны
               maxRotation: 0, // Без поворота
-              minRotation: 0
+              minRotation: 0,
+              padding: 20,
+              color: '#13151A',
+              font: {
+                size: 14, 
+                family: 'Golos'
+              }
             },
-            offset: true
+            offset: false,
+            grid: {
+              drawTicks: false,
+              drawBorder: false,
+              color: '#E6E9ED',
+            }
           },
           y: {
             title: { display: false, text: 'Место (полярность)' },
@@ -62,9 +74,20 @@ onMounted(() => {
             max: 10,
             reverse: true, // <-- инвертируем ось: 0 сверху, 10 снизу
             ticks: {
-              stepSize: 1
+              stepSize: 1,
+              padding: 20,
+              color: '#13151A',
+              font: {
+                size: 14, 
+                family: 'Golos'
+              }
             },
-            offset: true
+            offset: false,
+            grid: {
+              drawTicks: false,
+              drawBorder: false,
+              color: '#E6E9ED',
+            }
           }
         }
       }
