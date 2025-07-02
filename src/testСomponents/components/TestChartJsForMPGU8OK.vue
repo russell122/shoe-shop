@@ -14,7 +14,7 @@ const chartCanvas = ref(null);
 let chartInstance = null;
 
 const years = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
-const dataPoints = [6, 7, 9, 2, 6, 8, 2];
+const dataPoints = [600, 756, 993, 153, 643, 834, 500];
 
 onMounted(() => {
   if (chartCanvas.value) {
@@ -31,55 +31,72 @@ onMounted(() => {
           pointRadius: 4,
           tension: 0,
           borderJoinStyle: 'miter',
+          clip: { left: 20, right: 20, top: false, bottom: false },
           fill: {
             target: 'start',
-            above: 'rgba(0, 123, 255, 0.3)'
+            above: 'rgba(0, 123, 255, 1)'
           }
         }]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
           tooltip: { enabled: true }
         },
         scales: {
           x: {
-            title: { display: false },
+            title: { display: false, text: 'Год' },
             ticks: {
               autoSkip: false,
               maxRotation: 0,
               minRotation: 0,
-              padding: 20 // Убираем отступы у меток
+              padding: 20,
+              color: '#13151A',
+              font: {
+                size: 14,
+                family: 'Golos'
+              }
             },
             offset: false,
             grid: {
               drawTicks: false,
-              drawBorder: false
-            },
-            afterFit: function(scale) {
-              scale.paddingLeft = 0;
-              scale.paddingRight = 0;
+              drawBorder: false,
+              color: '#E6E9ED'
             }
+            // afterFit: function(scale) {
+            //   scale.paddingLeft = 0;
+            //   scale.paddingRight = 20;
+            // }
           },
           y: {
-            title: { display: false },
-            min: 1,
-            max: 10,
-            reverse: true,
+            title: { display: false, text: 'Место (полярность)' },
+            suggestedMin: 0,  // Минимальное значение
+            suggestedMax: 1000,  // Максимальное значение
+            reverse: false,
             ticks: {
-              stepSize: 1,
-              padding: 20 // Убираем отступы у меток
+              callback: function(value) {
+                if (value % 100 === 0) {  // Проверяем, делится ли значение на 100
+                  return value;
+                }
+                return null;  // Иначе не показываем
+              },
+              stepSize: 100,
+              padding: 20,
+              color: '#13151A',
+              align: 'start',
+              font: {
+                size: 14,
+                family: 'Golos'
+              }
             },
             offset: false,
             grid: {
-              drawBorder: false
+              drawTicks: false,
+              drawBorder: false,
+              color: '#E6E9ED'
             }
           }
-        },
-        layout: {
-          padding: 0
         }
       }
     });
@@ -100,13 +117,5 @@ onBeforeUnmount(() => {
   margin: 40px 0;
   background: #fff;
   border-radius: 8px;
-  padding: 5px; /* Минимальный отступ для контейнера */
-}
-
-.chart-container canvas {
-  display: block;
-  width: 100% !important;
-  height: auto !important;
-  margin: 0;
 }
 </style>

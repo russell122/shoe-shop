@@ -38,7 +38,7 @@ onMounted(() => {
           pointRadius: 4,
           tension: 0,
           borderJoinStyle: 'miter',
-          clip: {left: 20, right: 20, top: false, bottom: false}
+          clip: { left: 20, right: 20, top: false, bottom: false }
         }]
       },
       options: {
@@ -51,13 +51,13 @@ onMounted(() => {
           x: {
             title: { display: false, text: 'Год' },
             ticks: {
-              autoSkip: false, // Все метки будут показаны
-              maxRotation: 0, // Без поворота
+              autoSkip: false,
+              maxRotation: 0,
               minRotation: 0,
               padding: 20,
               color: '#13151A',
               font: {
-                size: 14, 
+                size: 14,
                 family: 'Golos'
               }
             },
@@ -65,7 +65,7 @@ onMounted(() => {
             grid: {
               drawTicks: false,
               drawBorder: false,
-              color: '#E6E9ED',
+              color: '#E6E9ED'
             }
           },
           y: {
@@ -78,7 +78,7 @@ onMounted(() => {
               padding: 20,
               color: '#13151A',
               font: {
-                size: 14, 
+                size: 14,
                 family: 'Golos'
               }
             },
@@ -86,7 +86,7 @@ onMounted(() => {
             grid: {
               drawTicks: false,
               drawBorder: false,
-              color: '#E6E9ED',
+              color: '#E6E9ED'
             }
           }
         }
