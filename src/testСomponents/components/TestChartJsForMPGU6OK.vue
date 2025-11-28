@@ -25,6 +25,61 @@ const currentYearData = computed(() => {
   return yearData ? yearData.data : [];
 });
 
+const emit = defineEmits(['name-click']);
+
+// Функция для определения, кликнули ли на метку оси Y
+const isClickOnYAxisLabel = (event, chart) => {
+  if (!chart || !chart.scales.y) return false;
+
+  const yScale = chart.scales.y;
+  const rect = chart.canvas.getBoundingClientRect();
+
+  // Получаем позицию и размеры оси Y
+  const yAxisLeft = yScale.left;
+  const yAxisRight = yScale.right;
+  const yAxisTop = yScale.top;
+  const yAxisBottom = yScale.bottom;
+
+  // Проверяем, находится ли клик в области оси Y
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  return x >= yAxisLeft && x <= yAxisRight && y >= yAxisTop && y <= yAxisBottom;
+};
+
+// Функция для определения, на какую метку оси Y кликнули
+const getClickedLabelIndex = (event, chart) => {
+  if (!chart || !chart.scales.y) return -1;
+
+  const yScale = chart.scales.y;
+  const rect = chart.canvas.getBoundingClientRect();
+  const y = event.clientY - rect.top;
+
+  // Вычисляем индекс метки на основе позиции клика
+  const pixelRange = yScale.bottom - yScale.top;
+  const valueRange = yScale.max - yScale.min;
+  const relativePosition = (y - yScale.top) / pixelRange;
+  const value = yScale.max - relativePosition * valueRange;
+
+  // Округляем до ближайшего целого (индекса)
+  return Math.round(value);
+};
+
+const handleCanvasClick = (event) => {
+  if (!chartInstance) return;
+
+  // Проверяем, кликнули ли на ось Y
+  if (isClickOnYAxisLabel(event, chartInstance)) {
+    const labelIndex = getClickedLabelIndex(event, chartInstance);
+
+    if (labelIndex >= 0 && labelIndex < currentYearData.value.length) {
+      const clickedName = currentYearData.value[labelIndex];
+      // console.log('Кликнули на имя:', clickedName.name);
+      emit('name-click', clickedName);
+    }
+  }
+};
+
 const updateChart = () => {
   if (!chartCanvas.value || !currentYearData.value.length) return;
 
@@ -43,14 +98,12 @@ const updateChart = () => {
         borderColor: '#fff',
         borderWidth: 1,
         borderRadius: { topRight: 20, bottomRight: 20, topLeft: 20, bottomLeft: 20 }
-        // Уберите barThickness, если хотите использовать процентные соотношения
-        // barThickness: 20, // <- комментируем или удаляем эту строку
       }]
     },
     options: {
       indexAxis: 'y',
       responsive: true,
-      maintainAspectRatio: false, // Важно добавить!
+      maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         tooltip: { enabled: false }
@@ -64,17 +117,34 @@ const updateChart = () => {
         y: {
           ticks: {
             color: '#13151A',
-            font: { size: 14, family: 'Golos' }
+            font: { size: 14, family: 'Golos' },
+            // Делаем метки похожими на кликабельные ссылки
+            callback: function(value, index) {
+              return currentYearData.value[index]?.name || value;
+            }
           },
           grid: { display: false },
           border: { display: false },
-          // Настройки расстояния между колонками:
-          categoryPercentage: 0.8, // Пространство для всей категории (включая отступы)
-          barPercentage: 0.6     // Пространство, занимаемое самим баром
+          categoryPercentage: 0.8,
+          barPercentage: 0.6
+        }
+      },
+      onHover: (event, elements) => {
+        const canvas = event.native?.target;
+        if (canvas && isClickOnYAxisLabel(event, chartInstance)) {
+          canvas.style.cursor = 'pointer';
+        } else if (canvas) {
+          canvas.style.cursor = 'default';
         }
       }
     }
   });
+
+  // Добавляем обработчик кликов
+  if (chartCanvas.value) {
+    chartCanvas.value.addEventListener('click', handleCanvasClick);
+    chartCanvas.value.style.cursor = 'default';
+  }
 };
 
 onMounted(() => {
@@ -87,12 +157,14 @@ onBeforeUnmount(() => {
   if (chartInstance) {
     chartInstance.destroy();
   }
+  if (chartCanvas.value) {
+    chartCanvas.value.removeEventListener('click', handleCanvasClick);
+  }
 });
 
 watch([() => props.selectArrYears, currentYearData], () => {
   updateChart();
 }, { immediate: true });
-
 </script>
 
 <template>
@@ -129,6 +201,19 @@ watch([() => props.selectArrYears, currentYearData], () => {
     width: 100%;
     height: 1px;
     background: #E6E9ED;
+  }
+}
+
+/* Стили для кликабельных меток */
+:deep(.chartjs-render-monitor) {
+  .chartjs-scale-y {
+    .chartjs-tick {
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 }
 </style>

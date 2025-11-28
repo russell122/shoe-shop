@@ -2,6 +2,10 @@
 import { ref, computed, watch } from 'vue';
 import TestChartJsForMPGU6OK from '@/testСomponents/components/TestChartJsForMPGU6OK.vue';
 
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 const arrYearsMen = ref([
   {
     year: 2023,
@@ -77,6 +81,16 @@ watch(() => arrYearsMen.value, (newVal) => {
   }
 }, { immediate: true });
 
+const handleNameClick = async (clickedName) => {
+  console.log('Кликнули на имя:', clickedName);
+  // Здесь можно добавить любую логику:
+  // - переход на другую страницу
+  // - открытие модального окна
+  // - фильтрация данных и т.д.
+  console.log(`Кликнули на: ${clickedName.name} (ID: ${clickedName.id_name})`);
+  await router.replace({ name: 'dataRetrievalError' });
+};
+
 </script>
 
 <template>
@@ -90,8 +104,8 @@ watch(() => arrYearsMen.value, (newVal) => {
       ></v-select>
     </v-col>
 
-    <TestChartJsForMPGU6OK :data="arrYearsMen" :selectArrYears="selectArrYears" />
-    <TestChartJsForMPGU6OK :data="arrYearsWomen" :selectArrYears="selectArrYears" />
+    <TestChartJsForMPGU6OK :data="arrYearsMen" :selectArrYears="selectArrYears" @name-click="handleNameClick" />
+    <TestChartJsForMPGU6OK :data="arrYearsWomen" :selectArrYears="selectArrYears" @name-click="handleNameClick" />
   </div>
 </template>
 
