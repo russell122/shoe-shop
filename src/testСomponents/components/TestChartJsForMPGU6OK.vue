@@ -168,40 +168,70 @@ watch([() => props.selectArrYears, currentYearData], () => {
 </script>
 
 <template>
-  <div class="chart-container">
-    <canvas ref="chartCanvas"></canvas>
+  <div class="chart-scroll-container">
+    <div class="chart-container">
+      <canvas ref="chartCanvas"></canvas>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.chart-container {
+.chart-scroll-container {
   width: 100%;
+  max-height: 300px; /* Фиксированная максимальная высота для скролла */
+  overflow-y: auto;
+  overflow-x: hidden;
   margin: 0 0 40px 0;
   background: #fff;
   border-radius: 8px;
+  position: relative;
+}
+
+.chart-container {
+  width: 100%;
   padding-left: 80px;
   position: relative;
-  height: 300px;
+  min-height: 400px; /* Минимальная высота */
+  height: auto; /* Автоматическая высота для контента */
+}
 
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 6%;
-    width: 1px;
-    height: 94%;
-    background: #E6E9ED;
-  }
+.chart-container::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6%;
+  width: 1px;
+  height: 94%;
+  background: #E6E9ED;
+}
 
-  &::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 1px;
-    background: #E6E9ED;
-  }
+.chart-container::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: #E6E9ED;
+}
+
+/* Кастомный скроллбар */
+.chart-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 /* Стили для кликабельных меток */
