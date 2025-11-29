@@ -181,7 +181,7 @@ onBeforeUnmount(() => {
     chartCanvas.value.removeEventListener('click', handleCanvasClick);
   }
   if (simpleBarInstance) {
-    simpleBarInstance.unmount();
+    simpleBarInstance.unMount();
   }
 });
 
