@@ -15,6 +15,8 @@ import TestChartJsForMPGU4 from '@/testСomponents/components/TestChartJsForMPGU
 import TestChartJsForMPGU5 from '@/testСomponents/components/TestChartJsForMPGU5.vue';
 import TestChartJsForMpgu6Ok from '@/testСomponents/components/TestChartJsForMPGU6OK.vue';
 import TestChartJsForMpgu7Ok from '@/testСomponents/components/TestChartJsForMPGU7OK.vue';
+import TestChartJsForMpgu7OkTEST from '@/testСomponents/components/TestChartJsForMPGU7OKTEST.vue';
+import TestChartJsForMpgu8Ok from '@/testСomponents/components/TestChartJsForMPGU8OK.vue';
 import WrapTestChartJsForMPGU2 from '@/testСomponents/components/WrapTestChartJsForMPGU2.vue';
 
 const data = ref({
@@ -132,17 +134,21 @@ const data = ref({
   <!--  </div>-->
 
 
-  <!--  <div class="container">-->
-  <!--    <div class="test__wrap">-->
-  <!--      <div class="test__left">-->
-  <!--        <TestChartJsForMpgu7Ok />-->
-  <!--      </div>-->
-  <!--      <div class="test__right">-->
-  <!--        <TestChartJsForMpgu7Ok />-->
+  <div class="container">
+    <TestChartJsForMpgu7OkTEST />
+    <TestChartJsForMpgu7Ok />
+    <TestChartJsForMpgu8Ok />
 
-  <!--      </div>-->
-  <!--    </div>-->
-  <!--  </div>-->
+    <!--    <div class="test__wrap">-->
+    <!--      <div class="test__left">-->
+    <!--        <TestChartJsForMpgu7Ok />-->
+    <!--      </div>-->
+    <!--      <div class="test__right">-->
+    <!--        <TestChartJsForMpgu7Ok />-->
+
+    <!--      </div>-->
+    <!--    </div>-->
+  </div>
 
   <!--  <div class="container">-->
   <!--    <TestChartJsForMPGU4-->

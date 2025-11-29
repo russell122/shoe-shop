@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import TestChartJsForMPGU6OK from '@/testСomponents/components/TestChartJsForMPGU6OK.vue';
+import TestChartJsForMPGU6OKTEST from '@/testСomponents/components/TestChartJsForMPGU6OKTEST.vue';
 
 import { useRouter } from 'vue-router';
 
@@ -106,6 +107,9 @@ const handleNameClick = async (clickedName) => {
 
     <TestChartJsForMPGU6OK :data="arrYearsMen" :selectArrYears="selectArrYears" @name-click="handleNameClick" />
     <TestChartJsForMPGU6OK :data="arrYearsWomen" :selectArrYears="selectArrYears" @name-click="handleNameClick" />
+
+    <TestChartJsForMPGU6OKTEST :data="arrYearsMen" :selectArrYears="selectArrYears" @name-click="handleNameClick" />
+    <TestChartJsForMPGU6OKTEST :data="arrYearsWomen" :selectArrYears="selectArrYears" @name-click="handleNameClick" />
   </div>
 </template>
 
